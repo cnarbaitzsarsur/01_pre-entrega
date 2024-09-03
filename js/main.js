@@ -5,12 +5,17 @@ const map = new mapboxgl.Map({
     container: 'map', // container ID
     style: 'mapbox://styles/labparquepatricios/cm0l88ug2008q01qodhxvfwek',
     center: [16.37, 48.20], // starting position [lng, lat]. Note that lat must be set between -90 and 90
-    zoom: 12, // starting zoom
+    zoom: 12.9, // starting zoom
     minZoom: 10,
     maxZoom: 16 
 });
 
+document.getElementById('loading-spinner').style.display = 'flex';
+
 map.on('load', () => {
+
+    document.getElementById('loading-spinner').style.display = 'none';
+
     // Add the green spaces source
     map.addSource('big-gs', {
         type: 'geojson',

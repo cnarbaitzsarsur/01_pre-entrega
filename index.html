@@ -6,7 +6,13 @@
         <meta http-equiv="X-UA-Compatible" content="IE-edge"/>
         <link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
         <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
+
+
         <link rel="stylesheet" href="./css/style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
 
         <title>Vienna social housing</title>
@@ -15,15 +21,48 @@
 
     <body>
 
-        <header> 
-            <h1> Social Housing Eligibility Checker </h1>
-        </header>
-
         <main>
             <div id="sidebar">
-                <h1>Hello!</h1>
-                <h2>This is a Social Housing Eligibility Calculator for the city of Vienna </h2>
-                <h4>Follow the instructions, answer the questions and we will assess you to see if you qualify for a social housing program</h2>
+                <div class="inner-inputs">
+                    <section class="intro">
+                        <h2>An X-Ray of Vienna's Social Housing</h2>
+                        <p>This map explores the use of critical mapping to observe the status of social housing in Vienna, encompassing affordability, ownership, housing quality, and proximity.</p>
+                    </section>
+                    <section class="properties">
+                        <div class="field">
+                            <h3>Green spaces coverage</h3>
+                            <button title="Explanation"></button>
+                            
+                            <div class="slider">
+                                <h4>Big Green spaces</h4>
+                                <span style="width: 1rem;"></span>
+                                <input id="big-green-coverage" type="range" min="0" max="800" step="100">
+                                <label for="big-green-coverage" style="left: -2rem;">
+                                    <mark id="big-buffer-distance">0m</mark>
+                                </label>
+                            </div>
+
+                            <div class="slider">
+                                <h4>Medium Green Spaces</h4>
+                                <input id="medium-green-coverage" type="range" min="0" max="400" step="100" value="0">
+                                <label for="medium-green-coverage">
+                                    <mark id="medium-buffer-distance">0m</mark>
+                                </label>
+                            </div>
+                            
+                            <div class="slider">
+                                <h4>Small Green Spaces</h4>
+                                <input id="small-green-coverage" type="range" min="0" max="200" step="100" value="0">
+                                <label for="small-green-coverage">
+                                    <mark id="small-buffer-distance">0m</mark>
+                                </label>
+                            </div>
+                        </div>
+                    </section>
+                    <section class ="elegibility">
+                        <button class="check-eligibility-btn" id="checkEligibilityBtn">Check Eligibility</button>
+                    </section>
+                </div>
             </div>
 
             <div id="map" class="map"></div>

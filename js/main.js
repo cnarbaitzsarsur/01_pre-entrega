@@ -3,13 +3,201 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoibGFicGFycXVlcGF0cmljaW9zIiwiYSI6ImNqOWE4OGY3MjEweHEzM3FtZHl0dmV5azEifQ.uIJaP80p-gQXAvPG8tF-3w';
 const map = new mapboxgl.Map({
     container: 'map', // container ID
-    style: 'mapbox://styles/labparquepatricios/cjeuewjhw0ghw2sp738995x9y',
+    style: 'mapbox://styles/labparquepatricios/cm0l88ug2008q01qodhxvfwek',
     center: [16.37, 48.20], // starting position [lng, lat]. Note that lat must be set between -90 and 90
     zoom: 12, // starting zoom
-    minZoom: 8,
-    maxZoom: 14 
+    minZoom: 10,
+    maxZoom: 16 
 });
 
+map.on('load', () => {
+    // Add the green spaces source
+    map.addSource('big-gs', {
+        type: 'geojson',
+        data: 'json/big-gs.geojson'
+    });
+
+    map.addSource('medium-gs', {
+        type: 'geojson',
+        data: 'json/medium-gs.geojson'
+    });
+
+    map.addSource('small-gs', {
+        type: 'geojson',
+        data: 'json/small-gs.geojson'
+    });
+
+    map.addLayer({
+        'id': 'big-gs',
+        'type': 'fill',
+        'source': 'big-gs',
+        'paint': {
+            'fill-color': '#f8d1d4',
+            'fill-opacity': 0
+        }
+    });
+
+    map.addLayer({
+        'id': 'medium-gs',
+        'type': 'fill',
+        'source': 'medium-gs',
+        'paint': {
+            'fill-color': '#f8d1d4',
+            'fill-opacity': 0
+        }
+    });
+
+    map.addLayer({
+        'id': 'small-gs',
+        'type': 'fill',
+        'source': 'small-gs',
+        'paint': {
+            'fill-color': '#f8d1d4',
+            'fill-opacity': 0
+        }
+    });
+
+     // Add the buffer zone source and layer
+     map.addSource('buffer-zone', {
+        type: 'geojson',
+        data: {
+            type: 'FeatureCollection',
+            features: []
+        }
+    });
+
+    map.addLayer({
+        'id': 'buffer-zone',
+        'type': 'fill',
+        'source': 'buffer-zone',
+        'paint': {
+            'fill-color': '#9b1c1f',
+            'fill-opacity': 0.1
+        }
+    });
+
+    // Add the social housing source and layer
+    map.addSource('social-housing', {
+        type: 'geojson',
+        data: 'json/social-housing.json'
+    });
+
+    map.addLayer({
+        'id': 'social-housing',
+        'type': 'fill',
+        'source': 'social-housing',
+        'paint': {
+            'fill-color': '#9b1c1f'
+        }
+    });
+
+    // Update buffer zone based on initial slider value
+    updateBufferZones();
+
+    // Slider event listeners
+    document.getElementById('big-green-coverage').addEventListener('input', updateBufferZones);
+    document.getElementById('medium-green-coverage').addEventListener('input', updateBufferZones);
+    document.getElementById('small-green-coverage').addEventListener('input', updateBufferZones);
+
+    // Update buffer distance display
+    document.getElementById('big-green-coverage').addEventListener('input', (event) => {
+        document.getElementById('big-buffer-distance').textContent = `${event.target.value}m`;
+    });
+    document.getElementById('medium-green-coverage').addEventListener('input', (event) => {
+        document.getElementById('medium-buffer-distance').textContent = `${event.target.value}m`;
+    });
+    document.getElementById('small-green-coverage').addEventListener('input', (event) => {
+        document.getElementById('small-buffer-distance').textContent = `${event.target.value}m`;
+    });
+
+    // Add click event listener to social housing layer
+    map.on('click', 'social-housing', (e) => {
+        const properties = e.features[0].properties;
+        const hofname = properties.HOFNAME || "N/A";
+        const address = properties.ADRESSE || "N/A";
+        const year = properties.BAUJAHR || "N/A";
+        const units = properties.WOHNUNGSANZAHL || "N/A";   
+        const pdfLink = properties.PDFLINK || "#"; 
+
+        const popupContent = `
+            <div>
+                <h3>${hofname}</h3>
+                <p>Constructed in ${year}</p>
+                <p><strong>No. of units:</strong> ${units}</p>
+                <p><strong>Address:</strong> ${address}</p>
+                <p><a href="${pdfLink}" target="_blank">View More Details (PDF)</a></p>
+            </div>
+        `;
+
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(popupContent)
+            .addTo(map);
+    });
+
+    map.on('mouseenter', 'social-housing', () => {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+
+    map.on('mouseleave', 'social-housing', () => {
+        map.getCanvas().style.cursor = '';
+    });
+});
+
+// Function to update buffer zones based on slider values
+function updateBufferZones() {
+    const bigBufferDistance = parseInt(document.getElementById('big-green-coverage').value, 10);
+    const mediumBufferDistance = parseInt(document.getElementById('medium-green-coverage').value, 10);
+    const smallBufferDistance = parseInt(document.getElementById('small-green-coverage').value, 10);
+
+    // Fetch and process each green space type
+    Promise.all([
+        fetch('json/big-gs.geojson').then(response => response.json()),
+        fetch('json/medium-gs.geojson').then(response => response.json()),
+        fetch('json/small-gs.geojson').then(response => response.json())
+    ]).then(([bigData, mediumData, smallData]) => {
+        const bigBufferFeatures = bigData.features.map(feature =>
+            turf.buffer(feature, bigBufferDistance, { units: 'meters' })
+        );
+        const mediumBufferFeatures = mediumData.features.map(feature =>
+            turf.buffer(feature, Math.min(mediumBufferDistance, 400), { units: 'meters' })
+        );
+        const smallBufferFeatures = smallData.features.map(feature =>
+            turf.buffer(feature, Math.min(smallBufferDistance, 200), { units: 'meters' })
+        );
+
+        const bufferFeatures = [...bigBufferFeatures, ...mediumBufferFeatures, ...smallBufferFeatures];
+
+        const bufferGeoJSON = {
+            type: 'FeatureCollection',
+            features: bufferFeatures
+        };
+
+        if (map.getSource('buffer-zone')) {
+            map.getSource('buffer-zone').setData(bufferGeoJSON);
+        } else {
+            map.addSource('buffer-zone', {
+                type: 'geojson',
+                data: bufferGeoJSON
+            });
+
+            map.addLayer({
+                'id': 'buffer-zone',
+                'type': 'fill',
+                'source': 'buffer-zone',
+                'paint': {
+                    'fill-color': '#f8d1d4',
+                    'fill-opacity': 0.5
+                }
+            });
+        }
+    }).catch(err => console.error('Error loading green spaces data:', err));
+}
+
+
+document.getElementById("checkEligibilityBtn").addEventListener("click", () => {
+    checkEligibility();
+})
 
 // Function to check if the user has Austrian citizenship
 function checkCitizenship() {

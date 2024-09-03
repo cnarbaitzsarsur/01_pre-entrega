@@ -4,23 +4,11 @@ html, body {
     padding: 0;
     display: flex;
     flex-direction: column; /* Aligns content vertically */
-    font-family: Arial, sans-serif;
-}
-
-header {
-    background-color: #DB404C;
-    color: #ffffff;
-    padding: 10px 20px;
-    text-align: center;
-}
-
-header h1 {
-    display: inline;
-    vertical-align: middle;
-    margin: 0;
+    font-family: "Raleway";
 }
 
 main {
+    height: 100%;
     display: flex; /* Enables flex properties for the main container */
     flex: 1; /* Takes up all available space after header */
     padding: 0;
@@ -28,10 +16,41 @@ main {
 }
 
 #sidebar {
-    width: 200px; /* fixed width for the sidebar */
-    background-color: #f0f0f0; /* light grey background */
-    padding: 10px;
+    position: relative;
+    width: 15rem;
+    height: 100%;
+    padding: 1rem;
+    color: white;
+    background-color: #9b1c1f;
+    box-shadow: .8rem 0 .8rem rgba(0, 0, 0, .03), .4rem 0 .4rem rgba(0, 0, 0, .03), .2rem 0 .2rem rgba(0, 0, 0, .03);
+    transition: max-width .5s ease-in-out;
+    z-index: 200;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;  
+}
+
+.intro p{
+    font-size: 0.8rem;
+}
+
+h4{
+    margin-block-end: 0.4em;
+}
+
+.sidebar .inner-inputs {
+    position: relative;
     box-sizing: border-box;
+    max-width: 25rem;
+    min-height: 100%;
+    padding-bottom: 27.1rem;
+}
+
+#intro {
+    margin-bottom: .8rem;
+    padding-top: 2.4rem;
+    text-align: center;
 }
 
 #map {
@@ -42,6 +61,37 @@ main {
     height: 100vh;
     width: 100%;
 }
+
+
+.mapboxgl-popup-content {
+    background: #9b1c1f;
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+    padding: 15px;
+    pointer-events: auto;
+    position: relative;
+    color: white;
+    font-family: "raleway";
+}
+
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip  {
+    border-top-color: #9b1c1f;
+}
+
+.mapboxgl-popup-close-button {
+    color: white;
+}
+
+.mapboxgl-popup-content a {
+    color: #ffffff; /* White color for the link */
+    font-weight: bold; /* Bold font for the link */
+    text-decoration: underline; /* Optional: underline the link */
+}
+
+.mapboxgl-popup-content a:hover {
+    color: #ffcccc; /* Optional: lighter color on hover */
+}
+
 
 img {
     height: 100vh;

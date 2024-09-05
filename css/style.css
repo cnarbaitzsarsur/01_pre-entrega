@@ -5,6 +5,7 @@ html, body {
     display: flex;
     flex-direction: column; /* Aligns content vertically */
     font-family: "Raleway";
+    overflow: hidden;
 }
 
 main {
@@ -60,6 +61,90 @@ h4{
     background-repeat: no-repeat;
     height: 100vh;
     width: 100%;
+    position:absolute;
+}
+
+#formView {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #9b1c1f;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: .8rem 0 .8rem rgba(0, 0, 0, .03), .4rem 0 .4rem rgba(0, 0, 0, .03), .2rem 0 .2rem rgba(0, 0, 0, .03);
+    z-index: 9999; /* Make sure it's on top of the map */
+    display: none; /* Initially hidden */
+    width: 20rem; /* Adjust as needed */
+    color: white;
+}
+
+
+
+#closeFormBtn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color:white;
+}
+
+.form-group {
+    margin: 2rem 1rem ;
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: medium;
+}
+
+select, input {
+    width: 50%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: transparent;
+    color: white;
+    text-align: center;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+}
+
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none; /* Chrome, Safari */
+}
+
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none; /* Chrome, Safari */
+}
+
+.error-message {
+    color: #9b1c1f;
+    font-size: 0.875em;
+}
+
+.submit-btn {
+    background-color: white;
+    color: #9b1c1f;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-size: 1em;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border 0.3s; /* Smooth transitions */
+}
+
+.submit-btn:hover {
+    background-color: #9b1c1f;
+    color: white;
+    border: 2px; 
+    border-color: white;
 }
 
 /* Style for the loading spinner */
@@ -122,8 +207,21 @@ h4{
     color: #ffcccc; /* Optional: lighter color on hover */
 }
 
+.check-eligibility-btn {
+    background-color: white;
+    color: #9b1c1f;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-size: 1em;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border 0.3s; /* Smooth transitions */
+}
 
-img {
-    height: 100vh;
-    width: auto;
+.check-eligibility-btn:hover {
+    background-color: #9b1c1f;
+    color: white;
+    border: 2px; 
+    border-color: white;
 }

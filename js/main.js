@@ -199,73 +199,122 @@ function updateBufferZones() {
     }).catch(err => console.error('Error loading green spaces data:', err));
 }
 
+// --- FORM --- //
 
-document.getElementById("checkEligibilityBtn").addEventListener("click", () => {
-    checkEligibility();
-})
+const formView = document.getElementById('formView');
+const checkEligibilityBtn = document.getElementById('checkEligibilityBtn');
 
-// Function to check if the user has Austrian citizenship
-function checkCitizenship() {
-    let citizenship = prompt("Do you have an Austrian Citizenship or equivalent? Answer with yes or no");
-    if (citizenship.toLowerCase() !== "yes") {
-        alert("You need to have an Austrian citizenship or equivalent to be eligible for social housing.");
-        return false;
+// Show form as a pop-up on top of the map when 'Check Eligibility' is clicked
+checkEligibilityBtn.addEventListener('click', function() {
+    formView.style.display = 'block'; // Show the form
+});
+
+// Retrieve and populate form data from local storage
+function retrieveFormData() {
+    const storedData = localStorage.getItem('formData');
+    if (storedData) {
+        const formData = JSON.parse(storedData);
+        document.getElementById('citizenship').value = formData.citizenship || '';
+        document.getElementById('age').value = formData.age || '';
+        document.getElementById('registration').value = formData.registration || '';
+        document.getElementById('income').value = formData.income || '';
+        document.getElementById('familySize').value = formData.familySize || '';
     }
-    return true;
-};
+}
 
-// Function to check the user's age
-function checkAge() {
-    let age = parseInt(prompt("Please enter your age:"));
-    if (isNaN(age) || age < 18) {
-        alert("You are too young to be eligible for social housing.");
-        return false;
+// Store form data in local storage when form is submitted
+function storeFormData() {
+    const formData = {
+        citizenship: document.getElementById('citizenship').value,
+        age: document.getElementById('age').value,
+        registration: document.getElementById('registration').value,
+        income: document.getElementById('income').value,
+        familySize: document.getElementById('familySize').value,
+    };
+    localStorage.setItem('formData', JSON.stringify(formData));
+}
+
+
+
+
+
+// Eligibility form submission
+const eligibilityForm = document.getElementById('eligibilityForm');
+eligibilityForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // Retrieve form values
+    const citizenship = document.getElementById('citizenship').value;
+    const age = parseInt(document.getElementById('age').value);
+    const registration = parseInt(document.getElementById('registration').value);
+    const income = parseFloat(document.getElementById('income').value);
+
+    // Eligibility check
+    let eligible = true;
+    document.getElementById('citizenshipMsg').textContent = '';
+    document.getElementById('ageMsg').textContent = '';
+    document.getElementById('registrationMsg').textContent = '';
+    document.getElementById('incomeMsg').textContent = '';
+
+    if (citizenship !== 'yes') {
+        document.getElementById('citizenshipMsg').textContent = 'You must have Austrian citizenship or equivalent.';
+        eligible = false;
     }
-    return true;
-};
-
-// Function to check the user's registration in Vienna
-function checkRegistration() {
-    let registration = parseInt(prompt("Please enter the total number of years you have been registered in Vienna:"));
-    if (isNaN(registration) || registration < 3) {
-        alert("You need to have been living in Vienna for at least 3 years to be eligible for social housing.");
-        return false;
+    if (age < 18) {
+        document.getElementById('ageMsg').textContent = 'You must be at least 18 years old.';
+        eligible = false;
     }
-    return true;
-};
-
-// Function to check the user's annual income
-function checkIncome() {
-    let annualIncome = parseFloat(prompt("Please enter your total annual household income:"));
-    if (isNaN(annualIncome) || annualIncome > 30000) {
-        alert("You need to earn less than 30,000€ annually to be eligible for social housing.");
-        return false;
+    if (registration < 3) {
+        document.getElementById('registrationMsg').textContent = 'You must have been registered in Vienna for at least 3 years.';
+        eligible = false;
     }
-    return true;
-};
+    if (income > 30000) {
+        document.getElementById('incomeMsg').textContent = 'Your income must be below €30,000 per year.';
+        eligible = false;
+    }
 
-// Check which type of housing they can get
+    // Display family size input if eligible
+    if (eligible) {
+        document.getElementById('eligibilityMessage').textContent = 'You are eligible!';
+        document.getElementById('familySizeGroup').style.display = 'block';
 
-//Housing types
-const housingOptions = [
-    {id: 1, name: "Small Apartment", size:50, rooms: 2, neighbouhood:"Leopoldstadt"},
-    {id: 2, name:"Medium Apartment", size:80, rooms: 3, neighborhood:"Margareten"},
-    {id: 3, name:"Large Apartment", size:120, rooms: 4, neighbouhood:"Wieden"},
-];
+        // Add event listener for family size submission
+        document.getElementById('familySize').addEventListener('input', function() {
+            const familySize = parseInt(this.value);
 
-// Function to calculate the maximum eligible housing size
-function calculateHousingSize(familyMembers) {
-    const minimumSpacePerPerson = 20; // For example, 20 m² per person
-    return familyMembers * minimumSpacePerPerson;
-};
+            if (familySize && familySize > 0) {
+                checkHousingOption(familySize);
+            }
+        });
+
+    } else {
+        document.getElementById('eligibilityMessage').textContent = 'You are not eligible for social housing.';
+    }
+
+     // Store form data after submission
+     storeFormData();
+
+});
+
+// Close the form when the close button is clicked
+const closeFormBtn = document.getElementById('closeFormBtn');
+closeFormBtn.addEventListener('click', function() {
+    document.getElementById('formView').style.display = 'none';
+    localStorage.removeItem('formData'); // Clear the stored data when closing the form
+});
 
 
-// Function to calculate which option is suitable based on family members
-function checkHousingOption (familyMembers) {
-    const requiredSize = calculateHousingSize(familyMembers);
+// Function to check suitable housing option
+function checkHousingOption(familySize) {
+    const housingOptions = [
+        { name: 'Small Apartment', size: 50, rooms: 2, neighborhood: 'Leopoldstadt' },
+        { name: 'Medium Apartment', size: 80, rooms: 3, neighborhood: 'Margareten' },
+        { name: 'Large Apartment', size: 120, rooms: 4, neighborhood: 'Wieden' },
+    ];
+
+    const requiredSize = familySize * 20; // Example: 20 m² per person
+
     let suitableHousing = null;
-
-    // Iterate through housing options to find the first suitable option
     for (const house of housingOptions) {
         if (house.size >= requiredSize) {
             suitableHousing = house;
@@ -273,46 +322,30 @@ function checkHousingOption (familyMembers) {
         }
     }
 
-    //Display the result
+    // Display housing option or a message if no suitable option is found
+    const suitableHouseMessage = document.getElementById('suitableHouseMessage')
     if (suitableHousing) {
-        alert((`You may be eligible for the ${suitableHousing.name} in ${suitableHousing.neighborhood}. It has ${suitableHousing.rooms} rooms and is ${suitableHousing.size} m² in size. Please contact your local housing authority for more information.`));
+        suitableHouseMessage.textContent = `You may be eligible for the ${suitableHousing.name} in ${suitableHousing.neighborhood}. It has ${suitableHousing.rooms} rooms and is ${suitableHousing.size} m² in size.`;
     } else {
-        alert ("Unfortunately, we do not have a suitable apartment based on your requirements. Please contact your local housing authority for further assistance.");
+        suitableHouseMessage.textContent = 'Unfortunately, we do not have a suitable apartment based on your requirements.';
     }
 }
 
-// Function to check eligibility for one applicant
-function checkEligibility() {
-    if (!checkCitizenship()) return;
-    if (!checkAge()) return;
-    if (!checkRegistration()) return;
-    if (!checkIncome()) return;
-
-    alert("You may be eligible for a social housing. Let's check which type");
-    
-    //Prompt for family members
-    const familyMembers = parseInt(prompt("Please enter the total number of family members:"));
-    
-    // Check and display the suitable housing option
-    checkHousingOption(familyMembers);
-};
-
-checkEligibility();
 
 
-// Function to check eligibility for multiple applicants
-function checkMultipleApplicants() {
-    let continueChecking = true;
-    while (continueChecking) {
-        checkEligibility();
-        // Ask if the user wants to check eligibility for another applicant
-        let anotherApplicant = prompt("Do you want to check eligibility for another applicant? Answer with yes or no");
-        if (anotherApplicant.toLowerCase() !== "yes") {
-            continueChecking = false;
-            alert("Thank you for using the Social Housing Eligibility Checker. Goodbye!");
-        }
-    }
-};
+// // Function to check eligibility for multiple applicants
+// function checkMultipleApplicants() {
+//     let continueChecking = true;
+//     while (continueChecking) {
+//         checkEligibility();
+//         // Ask if the user wants to check eligibility for another applicant
+//         let anotherApplicant = prompt("Do you want to check eligibility for another applicant? Answer with yes or no");
+//         if (anotherApplicant.toLowerCase() !== "yes") {
+//             continueChecking = false;
+//             alert("Thank you for using the Social Housing Eligibility Checker. Goodbye!");
+//         }
+//     }
+// };
 
-// Start the eligibility check process for multiple applicants
-checkMultipleApplicants();
+// // Start the eligibility check process for multiple applicants
+// checkMultipleApplicants();

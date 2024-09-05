@@ -7,13 +7,11 @@
         <link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
         <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
 
-
         <link rel="stylesheet" href="./css/style.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
-
+       
         <title>Vienna social housing</title>
 
     </head>
@@ -21,6 +19,8 @@
     <body>
 
         <main>
+
+            <!-- Sidebar -->
             <div id="sidebar">
                 <div class="inner-inputs">
                     <section class="intro">
@@ -56,24 +56,88 @@
                                     <mark id="small-buffer-distance">0m</mark>
                                 </label>
                             </div>
+
+                            
                         </div>
                     </section>
+                    
                     <section class ="elegibility">
                         <button class="check-eligibility-btn" id="checkEligibilityBtn">Check Eligibility</button>
                     </section>
+                    
                 </div>
             </div>
-
+            
+            <!-- Map View (Default)-->
             <div id="map" class="map"></div>
-
             <div id="loading-spinner" class="loading-spinner">
                 <div class="spinner"></div>
             </div>
-                
+                    
+            <!-- Eligibility Form View (Initially Hidden) -->
+            <div id="formView" style="display:none;">
+                <button id="closeFormBtn" style="position: absolute; top: 10px; right: 10px;">&times;</button>
+                <div class="form-container">
+                    <section class="eligibility-form">
+                        <form id="eligibilityForm">
+                            
+                            <!-- Citizenship Input -->
+                            <div class="form-group">
+                                <label for="citizenship">Do you have Austrian Citizenship or equivalent?</label>
+                                <select id="citizenship" name="citizenship" required>
+                                    <option value="">Select</option>
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                                <small id="citizenshipMsg" class="error-msg"></small>
+                            </div>
+
+                            <!-- Age Input -->
+                            <div class="form-group">
+                                <label for="age">Your Age:</label>
+                                <input type="number" id="age" name="age" min="18" required>
+                                <small id="ageMsg" class="error-msg"></small>
+                            </div>
+
+                            <!-- Registration Input -->
+                            <div class="form-group">
+                                <label for="registration">Years Registered in Vienna:</label>
+                                <input type="number" id="registration" name="registration" min="3" required>
+                                <small id="registrationMsg" class="error-msg"></small>
+                            </div>
+
+                            <!-- Income Input -->
+                            <div class="form-group">
+                                <label for="income">Total Annual Household Income (in €):</label>
+                                <input type="number" id="income" name="income" min="0" required>
+                                <small id="incomeMsg" class="error-msg"></small>
+                            </div>
+
+                            <!-- Eligibility Message -->
+                            <div id="eligibilityMessage" class="message"></div>
+
+                            <!-- Family Size Input (Hidden Initially) -->
+                            <div id="familySizeGroup" class="form-group" style="display:none;">
+                                <label for="familySize">Enter the total number of family members:</label>
+                                <input type="number" id="familySize" name="familySize" min="1">
+                                <small id="familySizeMsg" class="error-msg"></small>
+                            </div>
+
+                             <!-- Eligibility Message -->
+                             <div id="suitableHouseMessage" class="message"></div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="submit-btn">Check Eligibility</button>
+                        </form>
+                    </section>
+                </div>
+            </div>
+            
+            
         </main>
 
         <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
-        <script src="./js/main.js"></script>
+        <script type="module" src="./js/main.js"></script>
 
     </body>   
 </html>

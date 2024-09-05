@@ -47,42 +47,43 @@ map.on('load', () => {
         }
     }); 
 
-    let popup = new mapboxgl.Popup({
-        closeButton: false,
-        closeOnClick: false
-    });
-    
-    // Add hover event listener
-    map.on('mouseenter', 'social-housing', (e) => {
-        const properties = e.features[0].properties;
-        const hofname = properties.HOFNAME || "N/A";
-        const address = properties.ADRESSE || "N/A";
-        const year = properties.BAUJAHR || "N/A";
-        const units = properties.WOHNUNGSANZAHL || "N/A";   
-    
-        const popupContent = `
-            <div>
-                <h3>${hofname}</h3>
-                <p>Constructed in ${year}</p>
-                <p><strong>No. of units:</strong> ${units}</p>
-                <p><strong>Address:</strong> ${address}</p>
-            </div>
-        `;
-    
-        // Set popup content and position
-        popup.setLngLat(e.lngLat)
-             .setHTML(popupContent)
-             .addTo(map);
-    
-        map.getCanvas().style.cursor = 'pointer'; // Change the cursor style on hover
-    });
-    
-    // Reset the cursor and remove popup when the mouse leaves
-    map.on('mouseleave', 'social-housing', () => {
-        popup.remove();
-        map.getCanvas().style.cursor = '';
-    });
-    
+let popup = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: false
+});
+
+// Add hover event listener
+map.on('mouseenter', 'social-housing', (e) => {
+    const properties = e.features[0].properties;
+    const hofname = properties.HOFNAME || "N/A";
+    const address = properties.ADRESSE || "N/A";
+    const year = properties.BAUJAHR || "N/A";
+    const units = properties.WOHNUNGSANZAHL || "N/A";   
+
+    const popupContent = `
+        <div>
+            <h3>${hofname}</h3>
+            <p>Constructed in ${year}</p>
+            <p><strong>No. of units:</strong> ${units}</p>
+            <p><strong>Address:</strong> ${address}</p>
+        </div>
+    `;
+
+    // Set popup content and position
+    popup.setLngLat(e.lngLat)
+         .setHTML(popupContent)
+         .addTo(map);
+
+    map.getCanvas().style.cursor = 'pointer'; // Change the cursor style on hover
+});
+
+
+// Reset the cursor and remove popup when the mouse leaves
+map.on('mouseleave', 'social-housing', () => {
+    popup.remove();
+    map.getCanvas().style.cursor = '';
+});
+
 
     // Add click event listener to social housing layer
     map.on('click', 'social-housing', (e) => {

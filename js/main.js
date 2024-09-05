@@ -37,7 +37,7 @@ map.on('load', () => {
         'type': 'fill',
         'source': 'big-gs',
         'paint': {
-            'fill-color': '#f8d1d4',
+            'fill-color': '#cf2026',
             'fill-opacity': 0
         }
     });
@@ -63,7 +63,25 @@ map.on('load', () => {
     });
 
      // Add the buffer zone source and layer
-     map.addSource('buffer-zone', {
+     map.addSource('buffer-zone-big', {
+        type: 'geojson',
+        data: {
+            type: 'FeatureCollection',
+            features: []
+        }
+    });
+
+     // Add the buffer zone source and layer
+     map.addSource('buffer-zone-medium', {
+        type: 'geojson',
+        data: {
+            type: 'FeatureCollection',
+            features: []
+        }
+    });
+
+    // Add the buffer zone source and layer
+    map.addSource('buffer-zone-small', {
         type: 'geojson',
         data: {
             type: 'FeatureCollection',
@@ -72,14 +90,35 @@ map.on('load', () => {
     });
 
     map.addLayer({
-        'id': 'buffer-zone',
+        'id': 'buffer-zone-big',
         'type': 'fill',
         'source': 'buffer-zone',
         'paint': {
-            'fill-color': '#9b1c1f',
+            'fill-color': '#cf2026',
             'fill-opacity': 0.1
         }
     });
+
+    map.addLayer({
+        'id': 'buffer-zone-small',
+        'type': 'fill',
+        'source': 'buffer-zone',
+        'paint': {
+            'fill-color': '#cf2026',
+            'fill-opacity': 0.1
+        }
+    });
+
+    map.addLayer({
+        'id': 'buffer-zone-medium',
+        'type': 'fill',
+        'source': 'buffer-zone',
+        'paint': {
+            'fill-color': '#cf2026',
+            'fill-opacity': 0.1
+        }
+    });
+
 
     // Add the social housing source and layer
     map.addSource('social-housing', {
@@ -94,25 +133,6 @@ map.on('load', () => {
         'paint': {
             'fill-color': '#9b1c1f'
         }
-    });
-
-    // Update buffer zone based on initial slider value
-    updateBufferZones();
-
-    // Slider event listeners
-    document.getElementById('big-green-coverage').addEventListener('input', updateBufferZones);
-    document.getElementById('medium-green-coverage').addEventListener('input', updateBufferZones);
-    document.getElementById('small-green-coverage').addEventListener('input', updateBufferZones);
-
-    // Update buffer distance display
-    document.getElementById('big-green-coverage').addEventListener('input', (event) => {
-        document.getElementById('big-buffer-distance').textContent = `${event.target.value}m`;
-    });
-    document.getElementById('medium-green-coverage').addEventListener('input', (event) => {
-        document.getElementById('medium-buffer-distance').textContent = `${event.target.value}m`;
-    });
-    document.getElementById('small-green-coverage').addEventListener('input', (event) => {
-        document.getElementById('small-buffer-distance').textContent = `${event.target.value}m`;
     });
 
     // Add click event listener to social housing layer
@@ -149,6 +169,26 @@ map.on('load', () => {
     });
 });
 
+ // Update buffer zone based on initial slider value
+ updateBufferZones();
+
+ // Slider event listeners
+ document.getElementById('big-green-coverage').addEventListener('input', updateBufferZones);
+ document.getElementById('medium-green-coverage').addEventListener('input', updateBufferZones);
+ document.getElementById('small-green-coverage').addEventListener('input', updateBufferZones);
+
+ // Update buffer distance display
+ document.getElementById('big-green-coverage').addEventListener('input', (event) => {
+     document.getElementById('big-buffer-distance').textContent = `${event.target.value}m`;
+ });
+ document.getElementById('medium-green-coverage').addEventListener('input', (event) => {
+     document.getElementById('medium-buffer-distance').textContent = `${event.target.value}m`;
+ });
+ document.getElementById('small-green-coverage').addEventListener('input', (event) => {
+     document.getElementById('small-buffer-distance').textContent = `${event.target.value}m`;
+ });
+
+
 // Function to update buffer zones based on slider values
 function updateBufferZones() {
     const bigBufferDistance = parseInt(document.getElementById('big-green-coverage').value, 10);
@@ -161,41 +201,106 @@ function updateBufferZones() {
         fetch('json/medium-gs.geojson').then(response => response.json()),
         fetch('json/small-gs.geojson').then(response => response.json())
     ]).then(([bigData, mediumData, smallData]) => {
-        const bigBufferFeatures = bigData.features.map(feature =>
+
+
+        // Buffer big green spaces and handle MultiPolygon
+        let bigBufferFeatures = bigData.features.map(feature =>
             turf.buffer(feature, bigBufferDistance, { units: 'meters' })
         );
-        const mediumBufferFeatures = mediumData.features.map(feature =>
+        const bigFeatureCollection = {
+            type: 'FeatureCollection',
+            features: bigBufferFeatures
+        };
+        const bigDissolved = turf.dissolve(bigFeatureCollection);
+
+        // Buffer medium green spaces and handle MultiPolygon
+        let mediumBufferFeatures = mediumData.features.map(feature =>
             turf.buffer(feature, Math.min(mediumBufferDistance, 400), { units: 'meters' })
         );
-        const smallBufferFeatures = smallData.features.map(feature =>
+        const mediumFeatureCollection = {
+            type: 'FeatureCollection',
+            features: mediumBufferFeatures
+        };
+        const mediumDissolved = turf.dissolve(mediumFeatureCollection);
+
+        // Buffer small green spaces and handle MultiPolygon
+        let smallBufferFeatures = smallData.features.map(feature =>
             turf.buffer(feature, Math.min(smallBufferDistance, 200), { units: 'meters' })
         );
-
-        const bufferFeatures = [...bigBufferFeatures, ...mediumBufferFeatures, ...smallBufferFeatures];
-
-        const bufferGeoJSON = {
+        const smallFeatureCollection = {
             type: 'FeatureCollection',
-            features: bufferFeatures
+            features: smallBufferFeatures
         };
+        const smallDissolved = turf.dissolve(smallFeatureCollection);
 
-        if (map.getSource('buffer-zone')) {
-            map.getSource('buffer-zone').setData(bufferGeoJSON);
+
+
+    //    // Combine dissolved layers into a single FeatureCollection
+    //    const bufferGeoJSON = {
+    //     type: 'FeatureCollection',
+    //     features: [bigDissolved, mediumDissolved, smallDissolved].map(dissolved => dissolved.features[0])
+    // };
+
+
+        if (map.getSource('buffer-zone-big')) {
+            map.getSource('buffer-zone-big').setData(bigDissolved);
         } else {
-            map.addSource('buffer-zone', {
+            map.addSource('buffer-zone-big', {
                 type: 'geojson',
-                data: bufferGeoJSON
+                data: bigDissolved
             });
 
             map.addLayer({
-                'id': 'buffer-zone',
+                'id': 'buffer-zone-big',
                 'type': 'fill',
-                'source': 'buffer-zone',
+                'source': 'buffer-zone-big',
                 'paint': {
-                    'fill-color': '#f8d1d4',
+                    'fill-color': '#cf2026',
                     'fill-opacity': 0.5
                 }
             });
         }
+
+        if (map.getSource('buffer-zone-medium')) {
+            map.getSource('buffer-zone-medium').setData(mediumDissolved);
+        } else {
+            map.addSource('buffer-zone-medium', {
+                type: 'geojson',
+                data: mediumDissolved
+            });
+
+            map.addLayer({
+                'id': 'buffer-zone-medium',
+                'type': 'fill',
+                'source': 'buffer-zone-medium',
+                'paint': {
+                    'fill-color': '#cf2026',
+                    'fill-opacity': 0.5
+                }
+            });
+        }
+
+        if (map.getSource('buffer-zone-small')) {
+            map.getSource('buffer-zone-small').setData(smallDissolved);
+        } else {
+            map.addSource('buffer-zone-small', {
+                type: 'geojson',
+                data: mediumDissolved
+            });
+
+            map.addLayer({
+                'id': 'buffer-zone-small',
+                'type': 'fill',
+                'source': 'buffer-zone-small',
+                'paint': {
+                    'fill-color': '#cf2026',
+                    'fill-opacity': 0.5
+                }
+            });
+        }
+
+
+        
     }).catch(err => console.error('Error loading green spaces data:', err));
 }
 

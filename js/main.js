@@ -16,7 +16,7 @@ map.on('load', () => {
 
     document.getElementById('loading-spinner').style.display = 'none';
 
-    // Add the green spaces source
+    // Add the green spaces sources
     map.addSource('big-gs', {
         type: 'geojson',
         data: 'json/big-gs.geojson'
@@ -32,94 +32,6 @@ map.on('load', () => {
         data: 'json/small-gs.geojson'
     });
 
-    map.addLayer({
-        'id': 'big-gs',
-        'type': 'fill',
-        'source': 'big-gs',
-        'paint': {
-            'fill-color': '#cf2026',
-            'fill-opacity': 0
-        }
-    });
-
-    map.addLayer({
-        'id': 'medium-gs',
-        'type': 'fill',
-        'source': 'medium-gs',
-        'paint': {
-            'fill-color': '#f8d1d4',
-            'fill-opacity': 0
-        }
-    });
-
-    map.addLayer({
-        'id': 'small-gs',
-        'type': 'fill',
-        'source': 'small-gs',
-        'paint': {
-            'fill-color': '#f8d1d4',
-            'fill-opacity': 0
-        }
-    });
-
-     // Add the buffer zone source and layer
-     map.addSource('buffer-zone-big', {
-        type: 'geojson',
-        data: {
-            type: 'FeatureCollection',
-            features: []
-        }
-    });
-
-     // Add the buffer zone source and layer
-     map.addSource('buffer-zone-medium', {
-        type: 'geojson',
-        data: {
-            type: 'FeatureCollection',
-            features: []
-        }
-    });
-
-    // Add the buffer zone source and layer
-    map.addSource('buffer-zone-small', {
-        type: 'geojson',
-        data: {
-            type: 'FeatureCollection',
-            features: []
-        }
-    });
-
-    map.addLayer({
-        'id': 'buffer-zone-big',
-        'type': 'fill',
-        'source': 'buffer-zone',
-        'paint': {
-            'fill-color': '#cf2026',
-            'fill-opacity': 0.1
-        }
-    });
-
-    map.addLayer({
-        'id': 'buffer-zone-small',
-        'type': 'fill',
-        'source': 'buffer-zone',
-        'paint': {
-            'fill-color': '#cf2026',
-            'fill-opacity': 0.1
-        }
-    });
-
-    map.addLayer({
-        'id': 'buffer-zone-medium',
-        'type': 'fill',
-        'source': 'buffer-zone',
-        'paint': {
-            'fill-color': '#cf2026',
-            'fill-opacity': 0.1
-        }
-    });
-
-
     // Add the social housing source and layer
     map.addSource('social-housing', {
         type: 'geojson',
@@ -133,7 +45,44 @@ map.on('load', () => {
         'paint': {
             'fill-color': '#9b1c1f'
         }
+    }); 
+
+    let popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
     });
+    
+    // Add hover event listener
+    map.on('mouseenter', 'social-housing', (e) => {
+        const properties = e.features[0].properties;
+        const hofname = properties.HOFNAME || "N/A";
+        const address = properties.ADRESSE || "N/A";
+        const year = properties.BAUJAHR || "N/A";
+        const units = properties.WOHNUNGSANZAHL || "N/A";   
+    
+        const popupContent = `
+            <div>
+                <h3>${hofname}</h3>
+                <p>Constructed in ${year}</p>
+                <p><strong>No. of units:</strong> ${units}</p>
+                <p><strong>Address:</strong> ${address}</p>
+            </div>
+        `;
+    
+        // Set popup content and position
+        popup.setLngLat(e.lngLat)
+             .setHTML(popupContent)
+             .addTo(map);
+    
+        map.getCanvas().style.cursor = 'pointer'; // Change the cursor style on hover
+    });
+    
+    // Reset the cursor and remove popup when the mouse leaves
+    map.on('mouseleave', 'social-housing', () => {
+        popup.remove();
+        map.getCanvas().style.cursor = '';
+    });
+    
 
     // Add click event listener to social housing layer
     map.on('click', 'social-housing', (e) => {
@@ -233,70 +182,80 @@ function updateBufferZones() {
         };
         const smallDissolved = turf.dissolve(smallFeatureCollection);
 
+        // Update buffer zones
 
+        if (bigBufferDistance > 0) {
+            if (map.getSource('buffer-zone-big')) {
+                map.getSource('buffer-zone-big').setData(bigDissolved);
+                map.setLayoutProperty('buffer-zone-big', 'visibility', 'visible');
+            } else {
+                map.addSource('buffer-zone-big', {
+                    type: 'geojson',
+                    data: bigDissolved
+                });
 
-    //    // Combine dissolved layers into a single FeatureCollection
-    //    const bufferGeoJSON = {
-    //     type: 'FeatureCollection',
-    //     features: [bigDissolved, mediumDissolved, smallDissolved].map(dissolved => dissolved.features[0])
-    // };
-
-
-        if (map.getSource('buffer-zone-big')) {
-            map.getSource('buffer-zone-big').setData(bigDissolved);
+                map.addLayer({
+                    'id': 'buffer-zone-big',
+                    'type': 'fill',
+                    'source': 'buffer-zone-big',
+                    'paint': {
+                        'fill-color': '#cf2026',
+                        'fill-opacity': 0.5
+                    }
+                });
+            }
         } else {
-            map.addSource('buffer-zone-big', {
-                type: 'geojson',
-                data: bigDissolved
-            });
-
-            map.addLayer({
-                'id': 'buffer-zone-big',
-                'type': 'fill',
-                'source': 'buffer-zone-big',
-                'paint': {
-                    'fill-color': '#cf2026',
-                    'fill-opacity': 0.5
-                }
-            });
+            map.setLayoutProperty('buffer-zone-big', 'visibility', 'none');
         }
 
-        if (map.getSource('buffer-zone-medium')) {
-            map.getSource('buffer-zone-medium').setData(mediumDissolved);
-        } else {
-            map.addSource('buffer-zone-medium', {
-                type: 'geojson',
-                data: mediumDissolved
-            });
+        // Update medium buffer zone
+        if (mediumBufferDistance > 0) {
+            if (map.getSource('buffer-zone-medium')) {
+                map.getSource('buffer-zone-medium').setData(mediumDissolved);
+                map.setLayoutProperty('buffer-zone-medium', 'visibility', 'visible');
+            } else {
+                map.addSource('buffer-zone-medium', {
+                    type: 'geojson',
+                    data: mediumDissolved
+                });
 
-            map.addLayer({
-                'id': 'buffer-zone-medium',
-                'type': 'fill',
-                'source': 'buffer-zone-medium',
-                'paint': {
-                    'fill-color': '#cf2026',
-                    'fill-opacity': 0.5
-                }
-            });
+                map.addLayer({
+                    'id': 'buffer-zone-medium',
+                    'type': 'fill',
+                    'source': 'buffer-zone-medium',
+                    'paint': {
+                        'fill-color': '#cf2026',
+                        'fill-opacity': 0.5
+                    }
+                });
+            }
+        } else {
+            map.setLayoutProperty('buffer-zone-medium', 'visibility', 'none');
         }
 
-        if (map.getSource('buffer-zone-small')) {
-            map.getSource('buffer-zone-small').setData(smallDissolved);
-        } else {
-            map.addSource('buffer-zone-small', {
-                type: 'geojson',
-                data: mediumDissolved
-            });
+        // Update small buffer zone
+        if (smallBufferDistance > 0) {
+            if (map.getSource('buffer-zone-small')) {
+                map.getSource('buffer-zone-small').setData(smallDissolved);
+                map.setLayoutProperty('buffer-zone-small', 'visibility', 'visible');
+            } else {
+                map.addSource('buffer-zone-small', {
+                    type: 'geojson',
+                    data: smallDissolved
+                });
 
-            map.addLayer({
-                'id': 'buffer-zone-small',
-                'type': 'fill',
-                'source': 'buffer-zone-small',
-                'paint': {
-                    'fill-color': '#cf2026',
-                    'fill-opacity': 0.5
-                }
-            });
+                map.addLayer({
+                    'id': 'buffer-zone-small',
+                    'type': 'fill',
+                    'source': 'buffer-zone-small',
+                    'paint': {
+                        'fill-color': '#cf2026',
+                        'fill-opacity': 0.5
+                    }
+                });
+            }
+        } else {
+            map.setLayoutProperty('buffer-zone-small', 'visibility', 'none');
         }
 
 

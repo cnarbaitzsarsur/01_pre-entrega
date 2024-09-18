@@ -4,16 +4,18 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE-edge"/>
-        <link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
-        <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
-
-        <link rel="stylesheet" href="./css/style.css">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-       
+        
         <title>Vienna social housing</title>
 
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+        <link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
+        <link rel="stylesheet" href="./css/style.css">
+
+        <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     </head>
 
     <body>
@@ -22,15 +24,30 @@
 
             <!-- Sidebar -->
             <div id="sidebar">
-                <div class="inner-inputs">
+                <div id="intro-sidebar">
+                    <section id="intro">
+                        <h1>X-RAY OF VIENNA SOCIAL HOUSING</h1>
+                        <h5>Vienna, consistently ranked as one of the "most livable cities in the world", presents a unique model of urban development where environmental sustainability coexists with social equity. This interactive map, with a focus on social housing, explores the intricate balance of green spaces, public transportation, migration patterns, and rent prices across Vienna's districts. </h5>
+                    </section>
+                    <button class="white-btn" id="BtnToMap"> To the map</button>
+                    <section id="background">
+                        <h2> BACKGROUND </h2>
+                        <p>Vienna, consistently ranked as one of the "most livable cities in the world", presents a unique model of urban development where environmental sustainability coexists with social equity. This interactive map, with a focus on social housing, explores the intricate balance of green spaces, public transportation, migration patterns, and rent prices across Vienna's districts. </p>
+
+                    </section>
+                </div>
+                <div id="map-sidebar">
                     <section class="intro">
-                        <h2>An X-Ray of Vienna's Social Housing</h2>
-                        <p>This map explores social housing in Vienna, encompassing affordability, ownership, housing quality, and proximity. By clicking on individual buildings, you can access detailed information about each project.</p>
+                        <h1>X-RAY OF VIENNA SOCIAL HOUSING</h1>
+                        <h5>Here you can explore Vienna's green space and public transport coverage, while seeing the location of the social housing developments on the map.</h5>
                     </section>
                     <section class="properties">
                         <div class="field">
-                            <h3>Green spaces coverage</h3>
-                            <button title="Explanation"></button>
+                            <h4>DISTANCE COVERED
+                                <button title="Explanation" class="question-button">
+                                    <img src="svg/question-circle.svg" alt="question mark" width="20" height="20">
+                                </button>
+                            </h4>
                             
                             <div class="slider">
                                 <h4>Big Green spaces</h4>
@@ -62,17 +79,74 @@
                     </section>
                     
                     <section class ="elegibility">
-                        <button class="check-eligibility-btn" id="checkEligibilityBtn">Check Eligibility</button>
+                        <button class="white-btn" id="checkEligibilityBtn">Check Eligibility</button>
                     </section>
+
+                    <button class="white-btn" id="BtnToInfo"> Back to Info</button>
                     
                 </div>
+                <div id="districts-sidebar">
+
+                </div>
+            </div>
+
+            <!-- Popup Window -->
+            <div id="popup" class="popup-window">
+                <span class="popup-close" onclick="togglePopup()">&times;</span>
+                <p>This is an explanation about green spaces coverage.</p>
+            </div>
+
+            <div id="viewToggle">
+                <button id="mapViewBtn">Map</button>
+                <button id="districtsViewBtn">Districts</button>
             </div>
             
             <!-- Map View (Default)-->
-            <div id="map" class="map"></div>
-            <div id="loading-spinner" class="loading-spinner">
-                <div class="spinner"></div>
+            <div id="map" class="map">
+                <div id="loading-spinner" class="loading-spinner" class="spinner"></div>
             </div>
+
+            <!-- Districts View -->
+            <div id="districtsView" class="districts-view" style="display: none;">
+                <section>
+                        
+                    <section class="radarExplanation">
+                        <img src="svg/reference.svg" alt="District Reference">
+                        <section>
+                            <h2>District Radar Graphs</h2>
+                            <p>These 23 radar graphs compare Vienna's districts, highlighting various key factors and offering
+                                a holistic view of their urban characteristics. Despite Vienna's well-distributed social housing,
+                                contributing to a diverse social and cultural mix, disparities still exist among districts.</p>
+                        </section>
+                    </section>
+                    <section id="radarGraphs">
+                        <img src="svg/d1.svg" alt="District Reference">
+                        <img src="svg/d2.svg" alt="District Reference">
+                        <img src="svg/d3.svg" alt="District Reference">
+                        <img src="svg/d4.svg" alt="District Reference">
+                        <img src="svg/d5.svg" alt="District Reference">
+                        <img src="svg/d6.svg" alt="District Reference">
+                        <img src="svg/d7.svg" alt="District Reference">
+                        <img src="svg/d8.svg" alt="District Reference">
+                        <img src="svg/d9.svg" alt="District Reference">
+                        <img src="svg/d10.svg" alt="District Reference">
+                        <img src="svg/d11.svg" alt="District Reference">
+                        <img src="svg/d12.svg" alt="District Reference">
+                        <img src="svg/d13.svg" alt="District Reference">
+                        <img src="svg/d14.svg" alt="District Reference">
+                        <img src="svg/d15.svg" alt="District Reference">
+                        <img src="svg/d16.svg" alt="District Reference">
+                        <img src="svg/d17.svg" alt="District Reference">
+                        <img src="svg/d18.svg" alt="District Reference">
+                        <img src="svg/d19.svg" alt="District Reference">
+                        <img src="svg/d20.svg" alt="District Reference">
+                        <img src="svg/d21.svg" alt="District Reference">
+                        <img src="svg/d22.svg" alt="District Reference">
+                        <img src="svg/d23.svg" alt="District Reference">
+                    </section>
+                </section>
+            </div>
+               
                     
             <!-- Eligibility Form View (Initially Hidden) -->
             <div id="formView" style="display:none;">
@@ -135,7 +209,8 @@
             
             
         </main>
-
+        
+        <!-- Map View (Default)-->
         <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
         <script type="module" src="./js/main.js"></script>
 

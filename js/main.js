@@ -1,5 +1,4 @@
-// Create a map view
-
+// Mapbox access token and initialization
 mapboxgl.accessToken = 'pk.eyJ1IjoibGFicGFycXVlcGF0cmljaW9zIiwiYSI6ImNqOWE4OGY3MjEweHEzM3FtZHl0dmV5azEifQ.uIJaP80p-gQXAvPG8tF-3w';
 const map = new mapboxgl.Map({
     container: 'map', // container ID
@@ -10,32 +9,71 @@ const map = new mapboxgl.Map({
     maxZoom: 16 
 });
 
+// Loading spinner
 document.getElementById('loading-spinner').style.display = 'flex';
 
-map.on('load', () => {
+// SIDEBAR
 
+document.addEventListener('DOMContentLoaded', () => {
+    const introSidebar = document.getElementById('intro-sidebar');
+    const mapSidebar = document.getElementById('map-sidebar');
+    const districtsSidebar = document.getElementById('districts-sidebar');
+
+    const btnToMap = document.getElementById('BtnToMap');
+    const btnToInfo = document.getElementById('BtnToInfo');
+
+    const checkEligibilityBtn = document.getElementById('checkEligibilityBtn');
+    const closeFormBtn = document.getElementById('closeFormBtn');
+
+    btnToMap.addEventListener('click', () => {
+        introSidebar.style.display = 'none';
+        mapSidebar.style.display = 'block';
+    });
+
+    btnToInfo.addEventListener('click',() => {
+        mapSidebar.style.display = 'none';
+        introSidebar.style.display = 'block';
+    });
+
+    document.getElementById('districtsViewBtn').classList.add('active');
+
+
+    checkEligibilityBtn.addEventListener('click', () => {
+        introSidebar.style.display = 'none';
+        mapSidebar.style.display = 'none';
+        districtsSidebar.style.display = 'block'; // Adjust if needed
+    });
+
+    closeFormBtn.addEventListener('click', () => {
+        // Hide eligibility form or perform other actions
+        document.getElementById('formView').style.display = 'none';
+    });
+});
+
+// INFO BUTTONS
+
+document.querySelector('.question-button').addEventListener('click', function() {
+    Swal.fire({
+        title: 'Green Spaces Coverage',
+        text: 'It refers to the amount of land in an area that is covered by vegetation such as trees, grass, and other greenery.',
+        confirmButtonText: 'Got it!',
+        background: '#f0f0f0',
+        confirmButtonColor: '#9b1c1f'
+    });
+});
+
+// Map load event
+map.on('load', () => {
     document.getElementById('loading-spinner').style.display = 'none';
 
-    // Add the green spaces sources
-    map.addSource('big-gs', {
-        type: 'geojson',
-        data: 'json/big-gs.geojson'
+    // Add sources
+    map.addSource('big-gs', { type: 'geojson', data: 'json/big-gs.geojson'
     });
-
-    map.addSource('medium-gs', {
-        type: 'geojson',
-        data: 'json/medium-gs.geojson'
+    map.addSource('medium-gs', { type: 'geojson',data: 'json/medium-gs.geojson'
     });
-
-    map.addSource('small-gs', {
-        type: 'geojson',
-        data: 'json/small-gs.geojson'
+    map.addSource('small-gs', { type: 'geojson', data: 'json/small-gs.geojson'
     });
-
-    // Add the social housing source and layer
-    map.addSource('social-housing', {
-        type: 'geojson',
-        data: 'json/social-housing.json'
+    map.addSource('social-housing', { type: 'geojson', data: 'json/social-housing.json'
     });
 
     map.addLayer({
@@ -47,42 +85,42 @@ map.on('load', () => {
         }
     }); 
 
-let popup = new mapboxgl.Popup({
-    closeButton: false,
-    closeOnClick: false
-});
+    
+    // Popup setup Social Housing
+    let popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false
+    });
 
-// Add hover event listener
-map.on('mouseenter', 'social-housing', (e) => {
-    const properties = e.features[0].properties;
-    const hofname = properties.HOFNAME || "N/A";
-    const address = properties.ADRESSE || "N/A";
-    const year = properties.BAUJAHR || "N/A";
-    const units = properties.WOHNUNGSANZAHL || "N/A";   
+    // Add hover event listener
+    map.on('mouseenter', 'social-housing', (e) => {
+        const properties = e.features[0].properties;
+        const hofname = properties.HOFNAME || "N/A";
+        const address = properties.ADRESSE || "N/A";
+        const year = properties.BAUJAHR || "N/A";
+        const units = properties.WOHNUNGSANZAHL || "N/A";   
 
-    const popupContent = `
-        <div>
-            <h3>${hofname}</h3>
-            <p>Constructed in ${year}</p>
-            <p><strong>No. of units:</strong> ${units}</p>
-            <p><strong>Address:</strong> ${address}</p>
-        </div>
-    `;
+        const popupContent = `
+            <div>
+                <h3>${hofname}</h3>
+                <p>Constructed in ${year}</p>
+                <p><strong>No. of units:</strong> ${units}</p>
+                <p><strong>Address:</strong> ${address}</p>
+            </div>
+        `;
 
-    // Set popup content and position
-    popup.setLngLat(e.lngLat)
-         .setHTML(popupContent)
-         .addTo(map);
+        // Set popup content and position
+        popup.setLngLat(e.lngLat)
+            .setHTML(popupContent)
+            .addTo(map);
 
-    map.getCanvas().style.cursor = 'pointer'; // Change the cursor style on hover
-});
+        map.getCanvas().style.cursor = 'pointer'; // Change the cursor style on hover
+    });
 
 
-// Reset the cursor and remove popup when the mouse leaves
-map.on('mouseleave', 'social-housing', () => {
-    popup.remove();
-    map.getCanvas().style.cursor = '';
-});
+    // Reset the cursor and remove popup when the mouse leaves
+    map.on('mouseleave', 'social-housing', () => {
+        popup.remove();
+        map.getCanvas().style.cursor = '';
+    });
 
 
     // Add click event listener to social housing layer
@@ -119,8 +157,36 @@ map.on('mouseleave', 'social-housing', () => {
     });
 });
 
- // Update buffer zone based on initial slider value
- updateBufferZones();
+
+// Toggle view functionality
+document.getElementById('mapViewBtn').addEventListener('click', function() {
+    document.getElementById('districtsView').style.display = 'none';
+    document.getElementById('map').style.display = 'block';
+    document.getElementById('mapViewBtn').classList.add('active');
+
+});
+
+// Toggle to district view
+document.getElementById('districtsViewBtn').addEventListener('click', () => {
+    // Hide the map and show the district view
+    document.getElementById('map').style.display = 'none';
+    document.getElementById('districtsView').style.display = 'block';
+    document.getElementById('mapViewBtn').classList.remove('active');
+    document.getElementById('districtsViewBtn').classList.add('active');
+});
+
+
+
+// ----- BUFFERS ----- //
+function initializeSliders() {
+    document.getElementById('big-green-coverage').value = 0; // Default to 0 for big green spaces
+    document.getElementById('medium-green-coverage').value = 0;
+    document.getElementById('small-green-coverage').value = 0;
+}
+
+// Call the initialization function when the page loads
+document.addEventListener('DOMContentLoaded', initializeSliders);
+
 
  // Slider event listeners
  document.getElementById('big-green-coverage').addEventListener('input', updateBufferZones);
@@ -139,8 +205,7 @@ map.on('mouseleave', 'social-housing', () => {
  });
 
 
-// Function to update buffer zones based on slider values
-function updateBufferZones() {
+ function updateBufferZones() {
     const bigBufferDistance = parseInt(document.getElementById('big-green-coverage').value, 10);
     const mediumBufferDistance = parseInt(document.getElementById('medium-green-coverage').value, 10);
     const smallBufferDistance = parseInt(document.getElementById('small-green-coverage').value, 10);
@@ -151,7 +216,6 @@ function updateBufferZones() {
         fetch('json/medium-gs.geojson').then(response => response.json()),
         fetch('json/small-gs.geojson').then(response => response.json())
     ]).then(([bigData, mediumData, smallData]) => {
-
 
         // Buffer big green spaces and handle MultiPolygon
         let bigBufferFeatures = bigData.features.map(feature =>
@@ -271,7 +335,7 @@ const checkEligibilityBtn = document.getElementById('checkEligibilityBtn');
 
 // Show form as a pop-up on top of the map when 'Check Eligibility' is clicked
 checkEligibilityBtn.addEventListener('click', function() {
-    formView.style.display = 'block'; // Show the form
+    document.getElementById('formView').style.display = 'block';
 });
 
 // Retrieve and populate form data from local storage
@@ -298,10 +362,6 @@ function storeFormData() {
     };
     localStorage.setItem('formData', JSON.stringify(formData));
 }
-
-
-
-
 
 // Eligibility form submission
 const eligibilityForm = document.getElementById('eligibilityForm');
@@ -395,22 +455,3 @@ function checkHousingOption(familySize) {
         suitableHouseMessage.textContent = 'Unfortunately, we do not have a suitable apartment based on your requirements.';
     }
 }
-
-
-
-// // Function to check eligibility for multiple applicants
-// function checkMultipleApplicants() {
-//     let continueChecking = true;
-//     while (continueChecking) {
-//         checkEligibility();
-//         // Ask if the user wants to check eligibility for another applicant
-//         let anotherApplicant = prompt("Do you want to check eligibility for another applicant? Answer with yes or no");
-//         if (anotherApplicant.toLowerCase() !== "yes") {
-//             continueChecking = false;
-//             alert("Thank you for using the Social Housing Eligibility Checker. Goodbye!");
-//         }
-//     }
-// };
-
-// // Start the eligibility check process for multiple applicants
-// checkMultipleApplicants();

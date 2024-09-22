@@ -56,7 +56,18 @@
                     
                     <section class="properties">
                         <div class="field">
-                            <h4>DISTANCE COVERED
+                            <h4>HOUSING CONSTRUCTION YEAR
+                                <button title="Explanation" class="question-button">
+                                    <img src="svg/question-circle.svg" alt="question mark" width="20" height="20">
+                                </button>
+                            </h4>
+                            <div class="slider">
+                                <input type="range" id="yearSlider" min="1900" max="2023" value="2023" step="1">
+                                <span id="selectedYear">2023</span></div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <h4>DISTANCE COVERED by Green Spaces
                                 <button title="Explanation" class="question-button">
                                     <img src="svg/question-circle.svg" alt="question mark" width="20" height="20">
                                 </button>
@@ -87,7 +98,30 @@
                                 </label>
                             </div>
 
+                        </div>
+                        <div class="field">
+                            <h4>DISTANCE COVERED by Public Transport
+                                <button title="Explanation" class="question-button">
+                                    <img src="svg/question-circle.svg" alt="question mark" width="20" height="20">
+                                </button>
+                            </h4>
                             
+                            <div class="slider">
+                                <h4>Bus Stops</h4>
+                                <span style="width: 1rem;"></span>
+                                <input id="bus-buffer" type="range" min="0" max="400" step="100" value="0">
+                                <label for="bus-buffer">
+                                    <mark id="bus-buffer-distance">0m</mark>
+                                </label>
+                            </div>
+                        
+                            <div class="slider">
+                                <h4>U-Bahn Stops</h4>
+                                <input id="ubahn-buffer" type="range" min="0" max="800" step="100" value="0">
+                                <label for="ubahn-buffer">
+                                    <mark id="ubahn-buffer-distance">0m</mark>
+                                </label>
+                            </div>
                         </div>
                     </section>
                     

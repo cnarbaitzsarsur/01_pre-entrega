@@ -4,7 +4,7 @@ const map = new mapboxgl.Map({
     container: 'map', // container ID
     style: 'mapbox://styles/labparquepatricios/cm0l88ug2008q01qodhxvfwek',
     center: [16.37, 48.20], // starting position [lng, lat]. Note that lat must be set between -90 and 90
-    zoom: 12.9, // starting zoom
+    zoom: 11.9, // starting zoom
     minZoom: 10,
     maxZoom: 16 
 });
@@ -89,6 +89,13 @@ map.on('load', () => {
     });
     map.addSource('social-housing', { type: 'geojson', data: 'json/social-housing.json'
     });
+    map.addSource('block-baujahr', { type: 'geojson', data: 'json/block-baujahr.geojson'
+    });
+    // map.addSource('bus-stops', { type: 'geojson', data: 'json/bus-stops.geojson'
+    // });
+    // map.addSource('ubahn-stops', { type: 'geojson', data: 'json/ubahn-stops.geojson'
+    // });
+
 
     map.addLayer({
         'id': 'social-housing',
@@ -110,6 +117,35 @@ map.on('load', () => {
         filter: ['==', '$type', 'Polygon'] 
     });
     
+    map.addLayer({
+        'id': 'block-baujahr',
+        'type': 'fill',
+        'source': 'block-baujahr',
+        'paint': {
+            'fill-color': '#CF2026',
+            'fill-opacity': 0.6
+        }
+    }); 
+
+    // map.addLayer({
+    //     'id': 'bus-stops',
+    //     'type': 'circle', // Change to 'circle' for better visibility
+    //     'source': 'bus-stops',
+    //     'paint': {
+    //         'circle-color': 'blue', // Color for bus stops
+    //         'circle-radius': 2       // Adjust radius for visibility
+    //     }
+    // });
+
+    // map.addLayer({
+    //     'id': 'ubahn-stops',
+    //     'type': 'circle', // Using circle for uniformity
+    //     'source': 'ubahn-stops',
+    //     'paint': {
+    //         'circle-color': 'green', // Color for U-Bahn stops
+    //         'circle-radius': 2        // Adjust radius for visibility
+    //     }
+    // });
     
     // Popup setup Social Housing
     let popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false
@@ -214,11 +250,53 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// ----- SLIDER YEARS ----- //
+
+const yearSlider = document.getElementById('yearSlider');
+const selectedYearDisplay = document.getElementById('selectedYear');
+
+yearSlider.addEventListener('input', () => {
+    const selectedYear = parseInt(yearSlider.value, 10);
+    selectedYearDisplay.textContent = selectedYear;
+
+    // Call the function to update visible buildings
+    updateVisibleBuildings(selectedYear);
+});
+
+function updateVisibleBuildings(selectedYear) {
+    // Fetch social housing data
+    fetch('json/block-baujahr.geojson') 
+        .then(response => response.json())
+        .then(data => {
+            // Filter buildings based on BAUJAHR
+            const filteredBuildings = data.features.filter(feature => {
+                const baijahr = feature.properties.BAUJAHR1;
+                return baijahr <= selectedYear; // Include buildings built on or before the selected year
+            });
+
+            // Update map layer with filtered data
+            if (map.getSource('block-baujahr')) {
+                map.getSource('block-baujahr').setData({
+                    type: 'FeatureCollection',
+                    features: filteredBuildings
+                });
+            }
+        })
+        .catch(err => console.error('Error loading social housing data:', err));
+}
+
+// Initialize with the default value
+updateVisibleBuildings(parseInt(yearSlider.value, 10));
+
+
 // ----- BUFFERS ----- //
+
 function initializeSliders() {
-    document.getElementById('big-green-coverage').value = 0; // Default to 0 for big green spaces
+    document.getElementById('big-green-coverage').value = 0;
     document.getElementById('medium-green-coverage').value = 0;
     document.getElementById('small-green-coverage').value = 0;
+    // document.getElementById('bus-buffer').value = 0;
+    // document.getElementById('ubahn-buffer').value = 0;
 }
 
 // Call the initialization function when the page loads
@@ -229,6 +307,8 @@ document.addEventListener('DOMContentLoaded', initializeSliders);
  document.getElementById('big-green-coverage').addEventListener('input', updateBufferZones);
  document.getElementById('medium-green-coverage').addEventListener('input', updateBufferZones);
  document.getElementById('small-green-coverage').addEventListener('input', updateBufferZones);
+//  document.getElementById('bus-buffer').addEventListener('input', updatePublicTransportBuffers);
+// document.getElementById('ubahn-buffer').addEventListener('input', updatePublicTransportBuffers);
 
  // Update buffer distance display
  document.getElementById('big-green-coverage').addEventListener('input', (event) => {
@@ -240,6 +320,12 @@ document.addEventListener('DOMContentLoaded', initializeSliders);
  document.getElementById('small-green-coverage').addEventListener('input', (event) => {
      document.getElementById('small-buffer-distance').textContent = `${event.target.value}m`;
  });
+//  document.getElementById('bus-buffer').addEventListener('input', (event) => {
+//     document.getElementById('bus-buffer-distance').textContent = `${event.target.value}m`;
+// });
+// document.getElementById('ubahn-buffer').addEventListener('input', (event) => {
+//     document.getElementById('ubahn-buffer-distance').textContent = `${event.target.value}m`;
+// });
 
 
  function updateBufferZones() {
@@ -359,15 +445,98 @@ document.addEventListener('DOMContentLoaded', initializeSliders);
         } else {
             map.setLayoutProperty('buffer-zone-small', 'visibility', 'none');
         }
-
-
         
     }).catch(err => console.error('Error loading green spaces data:', err));
 }
 
+// function updatePublicTransportBuffers() {
+//     const busBufferDistance = parseInt(document.getElementById('bus-buffer').value, 10);
+//     const ubahnBufferDistance = parseInt(document.getElementById('ubahn-buffer').value, 10);
+
+//     // Fetch and process bus and U-Bahn data
+//     Promise.all([
+//         fetch('json/bus-stops.geojson').then(response => response.json()),
+//         fetch('json/ubahn-stops.geojson').then(response => response.json())
+//     ]).then(([busData, ubahnData]) => {
+
+//         // Buffer bus stops
+//         let busBufferFeatures = busData.features.map(feature =>
+//             turf.buffer(feature, busBufferFeatures, { units: 'meters' })
+//         );
+//         const busFeatureCollection = {
+//             type: 'FeatureCollection',
+//             features: busBufferFeatures
+//         };
+//         const busDissolved = turf.dissolve(busFeatureCollection);
+
+//         // Buffer U-Bahn stops
+//         let ubahnBufferFeatures = ubahnData.features.map(feature =>
+//             turf.buffer(feature, Math.min(ubahnBufferFeatures, 800), { units: 'meters' })
+//         );
+//         const ubahnFeatureCollection = {
+//             type: 'FeatureCollection',
+//             features: ubahnBufferFeatures
+//         };
+//         const ubahnDissolved = turf.dissolve(ubahnFeatureCollection);
+
+//         // Update buffer zones for bus stops
+//         if (busBufferDistance > 0) {
+//             if (map.getSource('buffer-zone-bus')) {
+//                 map.getSource('buffer-zone-bus').setData(busDissolved);
+//                 map.setLayoutProperty('buffer-zone-bus', 'visibility', 'visible');
+//             } else {
+//                 map.addSource('buffer-zone-bus', {
+//                     type: 'geojson',
+//                     data: busDissolved
+//                 });
+
+//                 map.addLayer({
+//                     'id': 'buffer-zone-bus',
+//                     'type': 'fill',
+//                     'source': 'buffer-zone-bus',
+//                     'paint': {
+//                         'fill-color': 'black',
+//                         'fill-opacity': 0.5
+//                     }
+//                 });
+//             }
+//         } else {
+//             map.setLayoutProperty('buffer-zone-bus', 'visibility', 'none');
+//         }
+
+//         // Update buffer zones for U-Bahn stops
+//         if (ubahnBufferDistance > 0) {
+//             if (map.getSource('buffer-zone-ubahn')) {
+//                 map.getSource('buffer-zone-ubahn').setData(ubahnDissolved);
+//                 map.setLayoutProperty('buffer-zone-ubahn', 'visibility', 'visible');
+//             } else {
+//                 map.addSource('buffer-zone-ubahn', {
+//                     type: 'geojson',
+//                     data: ubahnDissolved
+//                 });
+
+//                 map.addLayer({
+//                     'id': 'buffer-zone-ubahn',
+//                     'type': 'fill',
+//                     'source': 'buffer-zone-ubahn',
+//                     'paint': {
+//                        'fill-color': 'black',
+//                         'fill-opacity': 0.5
+//                     }
+//                 });
+//             }
+//         } else {
+//             map.setLayoutProperty('buffer-zone-ubahn', 'visibility', 'none');
+//         }
+
+//     }).catch(err => console.error('Error loading public transport data:', err));
+// }
+
+
 // --- FORM --- //
 
 // Retrieve and populate form data from local storage
+
 function retrieveFormData() {
     const storedData = localStorage.getItem('formData');
     if (storedData) {

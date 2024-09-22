@@ -9,20 +9,21 @@ const map = new mapboxgl.Map({
     maxZoom: 16 
 });
 
-// Loading spinner
+// LOADING SPINNER 
 document.getElementById('loading-spinner').style.display = 'flex';
 
-// SIDEBAR
+
+// ----- SIDEBAR ----- //
 
 document.addEventListener('DOMContentLoaded', () => {
     const introSidebar = document.getElementById('intro-sidebar');
     const mapSidebar = document.getElementById('map-sidebar');
-    const districtsSidebar = document.getElementById('districts-sidebar');
+    const formSidebar = document.getElementById('form-sidebar');
+
 
     const btnToMap = document.getElementById('BtnToMap');
     const btnToInfo = document.getElementById('BtnToInfo');
-
-    const checkEligibilityBtn = document.getElementById('checkEligibilityBtn');
+    const btnToCheckEligibility = document.getElementById('btnToCheckEligibility');
     const closeFormBtn = document.getElementById('closeFormBtn');
 
     btnToMap.addEventListener('click', () => {
@@ -35,22 +36,35 @@ document.addEventListener('DOMContentLoaded', () => {
         introSidebar.style.display = 'block';
     });
 
-    document.getElementById('districtsViewBtn').classList.add('active');
-
-
-    checkEligibilityBtn.addEventListener('click', () => {
+    btnToCheckEligibility.addEventListener('click', () => {
         introSidebar.style.display = 'none';
-        mapSidebar.style.display = 'none';
-        districtsSidebar.style.display = 'block'; // Adjust if needed
+        mapSidebar.style.display = 'block';
+        formSidebar.style.display = 'block'; // Adjust if needed
     });
+
+    document.getElementById('districtsViewBtn').classList.add('active');
 
     closeFormBtn.addEventListener('click', () => {
         // Hide eligibility form or perform other actions
-        document.getElementById('formView').style.display = 'none';
+        document.getElementById('form-sidebar').style.display = 'none';
     });
 });
 
-// INFO BUTTONS
+document.getElementById('readMoreBtn').addEventListener('click', function() {
+    const moreText = document.getElementById('moreText');
+    const btnText = document.getElementById('readMoreBtn');
+
+    if (moreText.style.display === "none") {
+        moreText.style.display = "inline";
+        btnText.innerHTML = "Read Less"; // Change button text
+    } else {
+        moreText.style.display = "none";
+        btnText.innerHTML = "Keep Reading"; // Change button text back
+    }
+});
+
+
+// ----- INFO BUTTONS ----- //
 
 document.querySelector('.question-button').addEventListener('click', function() {
     Swal.fire({
@@ -58,11 +72,11 @@ document.querySelector('.question-button').addEventListener('click', function() 
         text: 'It refers to the amount of land in an area that is covered by vegetation such as trees, grass, and other greenery.',
         confirmButtonText: 'Got it!',
         background: '#f0f0f0',
-        confirmButtonColor: '#9b1c1f'
+        confirmButtonColor: '#CF2026'
     });
 });
 
-// Map load event
+// ----- MAP LAYERS ----- //
 map.on('load', () => {
     document.getElementById('loading-spinner').style.display = 'none';
 
@@ -81,17 +95,28 @@ map.on('load', () => {
         'type': 'fill',
         'source': 'social-housing',
         'paint': {
-            'fill-color': '#9b1c1f'
+            'fill-color': '#CF2026'
         }
     }); 
-
+    
+    map.addLayer({
+        id: 'social-housing-buffer',
+        type: 'circle',
+        source: 'social-housing', 
+        paint: {
+            'circle-radius': 2, 
+            'circle-opacity': 0  
+        },
+        filter: ['==', '$type', 'Polygon'] 
+    });
+    
     
     // Popup setup Social Housing
     let popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false
     });
 
     // Add hover event listener
-    map.on('mouseenter', 'social-housing', (e) => {
+    map.on('mouseenter', 'social-housing-buffer', (e) => {
         const properties = e.features[0].properties;
         const hofname = properties.HOFNAME || "N/A";
         const address = properties.ADRESSE || "N/A";
@@ -100,10 +125,12 @@ map.on('load', () => {
 
         const popupContent = `
             <div>
-                <h3>${hofname}</h3>
-                <p>Constructed in ${year}</p>
-                <p><strong>No. of units:</strong> ${units}</p>
-                <p><strong>Address:</strong> ${address}</p>
+                <h3 style="text-transform: uppercase;">${hofname}</h3>
+               <div style="font-size: 130%;"> 
+                    <p>Constructed in ${year}</p>
+                    <p><strong>No. of units:</strong> ${units}</p>
+                    <p><strong>Address:</strong> ${address}</p>
+                </div>
             </div>
         `;
 
@@ -117,14 +144,14 @@ map.on('load', () => {
 
 
     // Reset the cursor and remove popup when the mouse leaves
-    map.on('mouseleave', 'social-housing', () => {
+    map.on('mouseleave', 'social-housing-buffer', () => {
         popup.remove();
         map.getCanvas().style.cursor = '';
     });
 
 
     // Add click event listener to social housing layer
-    map.on('click', 'social-housing', (e) => {
+    map.on('click', 'social-housing-buffer', (e) => {
         const properties = e.features[0].properties;
         const hofname = properties.HOFNAME || "N/A";
         const address = properties.ADRESSE || "N/A";
@@ -134,11 +161,13 @@ map.on('load', () => {
 
         const popupContent = `
             <div>
-                <h3>${hofname}</h3>
-                <p>Constructed in ${year}</p>
-                <p><strong>No. of units:</strong> ${units}</p>
-                <p><strong>Address:</strong> ${address}</p>
-                <p><a href="${pdfLink}" target="_blank">View More Details (PDF)</a></p>
+                <h3 style="text-transform: uppercase;">${hofname}</h3>
+                <div style="font-size: 130%;"> 
+                    <p>Constructed in ${year}</p>
+                    <p><strong>No. of units:</strong> ${units}</p>
+                    <p><strong>Address:</strong> ${address}</p>
+                    <p><a href="${pdfLink}" target="_blank">View More Details (PDF)</a></p>
+                </div>
             </div>
         `;
 
@@ -148,34 +177,42 @@ map.on('load', () => {
             .addTo(map);
     });
 
-    map.on('mouseenter', 'social-housing', () => {
+    map.on('mouseenter', 'social-housing-buffer', () => {
         map.getCanvas().style.cursor = 'pointer';
     });
 
-    map.on('mouseleave', 'social-housing', () => {
+    map.on('mouseleave', 'social-housing-buffer', () => {
         map.getCanvas().style.cursor = '';
     });
 });
 
+// ----- TOGGLE VIEW ----- //
 
-// Toggle view functionality
-document.getElementById('mapViewBtn').addEventListener('click', function() {
-    document.getElementById('districtsView').style.display = 'none';
-    document.getElementById('map').style.display = 'block';
+document.addEventListener('DOMContentLoaded', function() {
+    // Set the initial active/inactive states
     document.getElementById('mapViewBtn').classList.add('active');
+    document.getElementById('districtsViewBtn').classList.remove('active');
+    
+    // Display the map view by default
+    document.getElementById('map').style.display = 'block';
+    document.getElementById('districtsView').style.display = 'none';
 
+    // Toggle view functionality
+    document.getElementById('mapViewBtn').addEventListener('click', function() {
+        document.getElementById('map').style.display = 'block';
+        document.getElementById('districtsView').style.display = 'none';
+        document.getElementById('districtsViewBtn').classList.remove('active');
+        document.getElementById('mapViewBtn').classList.add('active');
+    });
+
+    // Toggle to district view
+    document.getElementById('districtsViewBtn').addEventListener('click', function() {
+        document.getElementById('map').style.display = 'none';
+        document.getElementById('districtsView').style.display = 'block';
+        document.getElementById('mapViewBtn').classList.remove('active');
+        document.getElementById('districtsViewBtn').classList.add('active');
+    });
 });
-
-// Toggle to district view
-document.getElementById('districtsViewBtn').addEventListener('click', () => {
-    // Hide the map and show the district view
-    document.getElementById('map').style.display = 'none';
-    document.getElementById('districtsView').style.display = 'block';
-    document.getElementById('mapViewBtn').classList.remove('active');
-    document.getElementById('districtsViewBtn').classList.add('active');
-});
-
-
 
 // ----- BUFFERS ----- //
 function initializeSliders() {
@@ -264,7 +301,7 @@ document.addEventListener('DOMContentLoaded', initializeSliders);
                     'type': 'fill',
                     'source': 'buffer-zone-big',
                     'paint': {
-                        'fill-color': '#cf2026',
+                        'fill-color': '#CF2026',
                         'fill-opacity': 0.5
                     }
                 });
@@ -289,7 +326,7 @@ document.addEventListener('DOMContentLoaded', initializeSliders);
                     'type': 'fill',
                     'source': 'buffer-zone-medium',
                     'paint': {
-                        'fill-color': '#cf2026',
+                        'fill-color': '#CF2026',
                         'fill-opacity': 0.5
                     }
                 });
@@ -314,7 +351,7 @@ document.addEventListener('DOMContentLoaded', initializeSliders);
                     'type': 'fill',
                     'source': 'buffer-zone-small',
                     'paint': {
-                        'fill-color': '#cf2026',
+                        'fill-color': '#CF2026',
                         'fill-opacity': 0.5
                     }
                 });
@@ -329,14 +366,6 @@ document.addEventListener('DOMContentLoaded', initializeSliders);
 }
 
 // --- FORM --- //
-
-const formView = document.getElementById('formView');
-const checkEligibilityBtn = document.getElementById('checkEligibilityBtn');
-
-// Show form as a pop-up on top of the map when 'Check Eligibility' is clicked
-checkEligibilityBtn.addEventListener('click', function() {
-    document.getElementById('formView').style.display = 'block';
-});
 
 // Retrieve and populate form data from local storage
 function retrieveFormData() {
@@ -424,7 +453,6 @@ eligibilityForm.addEventListener('submit', function(event) {
 // Close the form when the close button is clicked
 const closeFormBtn = document.getElementById('closeFormBtn');
 closeFormBtn.addEventListener('click', function() {
-    document.getElementById('formView').style.display = 'none';
     localStorage.removeItem('formData'); // Clear the stored data when closing the form
 });
 

@@ -27,13 +27,25 @@
                 <div id="intro-sidebar">
                     <section id="intro">
                         <h1>X-RAY OF VIENNA SOCIAL HOUSING</h1>
-                        <h5>Vienna, consistently ranked as one of the "most livable cities in the world", presents a unique model of urban development where environmental sustainability coexists with social equity. This interactive map, with a focus on social housing, explores the intricate balance of green spaces, public transportation, migration patterns, and rent prices across Vienna's districts. </h5>
+                        <h5> Vienna's social housing system is a world-renowned example. This interactive map explores its location, accessibility, and distribution across districts.  </h5>
                     </section>
-                    <button class="white-btn" id="BtnToMap"> To the map</button>
+                    
                     <section id="background">
                         <h2> BACKGROUND </h2>
-                        <p>Vienna, consistently ranked as one of the "most livable cities in the world", presents a unique model of urban development where environmental sustainability coexists with social equity. This interactive map, with a focus on social housing, explores the intricate balance of green spaces, public transportation, migration patterns, and rent prices across Vienna's districts. </p>
+                        <p id="textContent">
+                            By 1918, post-First World War, Vienna’s population was around two million. Inherited from the Habsburg Empire, severe housing shortages and deplorable living conditions persisted.
+                            Social housing initiatives began in 1919 with the victory of the Social Democratic Party. The period of Red Vienna (Rote Wien)(1919–1934) envisioned the non-commodified modern city as an emancipating project. This period gained momentum with Vienna's provincial status in 1922, which gave Vienna control over its own taxes. Tax reforms in 1923, by Hugo Breitner, allowed Vienna to buy land and properties to fund council housing projects. In 1923, the City Council aimed to build 25,000 flats in five years, completed by 1926. Another program in 1927 added 30,000 more. The focus was on creating healthy living conditions, coined "fresh air, light, and sunshine." 
+                            <span id="moreText">The Second World War destroyed 87,000 homes and priority was given to rebuilding. Between 1945 and 1960 close to 4,200 new municipal flats per year were constructed. Municipal and non-municipal sectors (co-operatives and associations) collaborated in housing production, with the latter erecting approx. 25 percent of all new dwellings. The reconstruction of Vienna was completed already before 1960. Council housing construction slowed in the 1970s, shifting towards public-private partnerships. In 1973, the number of flats completed by these partnerships exceeded that of municipal flats. This trend was influenced by the European Union’s regulation which limited public debt and investments making impossible to invest in social housing. Significant legislative reforms were made in the 1980s and 1990s, such as the liberalization of rent regulations and the establishment of the Housing Fund Vienna (Wohnfonds Wien) for managing municipal land and urban renewal subsidies. This subsidies offered low-interest loans to landlords in exchange for limited rents post-renovation. It also fostered tenant collaboration in building renovations to alleviate cultural and social displacement. Yet, the contemporary housing scene presents new challenges. The reliance on non-profit associations for social rental housing since 2004 underscores changing dynamics in housing provision, while the liberalization of rent regulations in the private market by the national government since 2010 has reshaped the balance between social and private housing sectors, particularly in the context of heightened migration and refugee influxes.
+                            </span>
+                        </p>
+                        <button class="red-btn" id="readMoreBtn">Keep Reading</button>
+                    </section>
 
+                    <button class="white-btn" id="BtnToMap"> To the map</button>
+
+                    <section id="footer">
+                        <p> by Camila Narbaitz Sarsur</p>
+                        <p><a href="http://www.cnscartography.com" target="_blank">www.cnscartography.com</a></p>
                     </section>
                 </div>
                 <div id="map-sidebar">
@@ -41,6 +53,7 @@
                         <h1>X-RAY OF VIENNA SOCIAL HOUSING</h1>
                         <h5>Here you can explore Vienna's green space and public transport coverage, while seeing the location of the social housing developments on the map.</h5>
                     </section>
+                    
                     <section class="properties">
                         <div class="field">
                             <h4>DISTANCE COVERED
@@ -73,20 +86,79 @@
                                     <mark id="small-buffer-distance">0m</mark>
                                 </label>
                             </div>
+                            
+                            <div id="coverage-display">0% of social housing is reachable by a green space</div>
 
                             
                         </div>
                     </section>
                     
                     <section class ="elegibility">
-                        <button class="white-btn" id="checkEligibilityBtn">Check Eligibility</button>
+                        <button class="white-btn" id="btnToCheckEligibility">Check Eligibility</button>
+
                     </section>
 
                     <button class="white-btn" id="BtnToInfo"> Back to Info</button>
                     
+                    
                 </div>
-                <div id="districts-sidebar">
+                <div id="form-sidebar" style="display:none;">
+                    <button id="closeFormBtn" style="position: absolute; top: 10px; right: 10px;">&times;</button>
+                    <div class="form-container">
+                        <section class="eligibility-form">
+                            <form id="eligibilityForm">
+                                
+                                <!-- Citizenship Input -->
+                                <div class="form-group">
+                                    <label for="citizenship">Do you have Austrian Citizenship or equivalent?</label>
+                                    <select id="citizenship" name="citizenship" required>
+                                        <option value="">Select</option>
+                                        <option value="yes">Yes</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                    <small id="citizenshipMsg" class="error-msg"></small>
+                                </div>
 
+                                <!-- Age Input -->
+                                <div class="form-group">
+                                    <label for="age">Your Age:</label>
+                                    <input type="number" id="age" name="age" min="18" required>
+                                    <small id="ageMsg" class="error-msg"></small>
+                                </div>
+
+                                <!-- Registration Input -->
+                                <div class="form-group">
+                                    <label for="registration">Years Registered in Vienna:</label>
+                                    <input type="number" id="registration" name="registration" min="3" required>
+                                    <small id="registrationMsg" class="error-msg"></small>
+                                </div>
+
+                                <!-- Income Input -->
+                                <div class="form-group">
+                                    <label for="income">Total Annual Household Income (in €):</label>
+                                    <input type="number" id="income" name="income" min="0" required>
+                                    <small id="incomeMsg" class="error-msg"></small>
+                                </div>
+
+                                <!-- Eligibility Message -->
+                                <div id="eligibilityMessage" class="message"></div>
+
+                                <!-- Family Size Input (Hidden Initially) -->
+                                <div id="familySizeGroup" class="form-group" style="display:none;">
+                                    <label for="familySize">Enter the total number of family members:</label>
+                                    <input type="number" id="familySize" name="familySize" min="1">
+                                    <small id="familySizeMsg" class="error-msg"></small>
+                                </div>
+
+                                <!-- Eligibility Message -->
+                                <div id="suitableHouseMessage" class="message"></div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="white-btn">Check Eligibility</button>
+
+                            </form>
+                        </section>
+                    </div>
                 </div>
             </div>
 
@@ -97,8 +169,8 @@
             </div>
 
             <div id="viewToggle">
-                <button id="mapViewBtn">Map</button>
-                <button id="districtsViewBtn">Districts</button>
+                <button id="mapViewBtn">MAP</button>
+                <button id="districtsViewBtn">DISTRICTS</button>
             </div>
             
             <!-- Map View (Default)-->
@@ -148,64 +220,7 @@
             </div>
                
                     
-            <!-- Eligibility Form View (Initially Hidden) -->
-            <div id="formView" style="display:none;">
-                <button id="closeFormBtn" style="position: absolute; top: 10px; right: 10px;">&times;</button>
-                <div class="form-container">
-                    <section class="eligibility-form">
-                        <form id="eligibilityForm">
-                            
-                            <!-- Citizenship Input -->
-                            <div class="form-group">
-                                <label for="citizenship">Do you have Austrian Citizenship or equivalent?</label>
-                                <select id="citizenship" name="citizenship" required>
-                                    <option value="">Select</option>
-                                    <option value="yes">Yes</option>
-                                    <option value="no">No</option>
-                                </select>
-                                <small id="citizenshipMsg" class="error-msg"></small>
-                            </div>
-
-                            <!-- Age Input -->
-                            <div class="form-group">
-                                <label for="age">Your Age:</label>
-                                <input type="number" id="age" name="age" min="18" required>
-                                <small id="ageMsg" class="error-msg"></small>
-                            </div>
-
-                            <!-- Registration Input -->
-                            <div class="form-group">
-                                <label for="registration">Years Registered in Vienna:</label>
-                                <input type="number" id="registration" name="registration" min="3" required>
-                                <small id="registrationMsg" class="error-msg"></small>
-                            </div>
-
-                            <!-- Income Input -->
-                            <div class="form-group">
-                                <label for="income">Total Annual Household Income (in €):</label>
-                                <input type="number" id="income" name="income" min="0" required>
-                                <small id="incomeMsg" class="error-msg"></small>
-                            </div>
-
-                            <!-- Eligibility Message -->
-                            <div id="eligibilityMessage" class="message"></div>
-
-                            <!-- Family Size Input (Hidden Initially) -->
-                            <div id="familySizeGroup" class="form-group" style="display:none;">
-                                <label for="familySize">Enter the total number of family members:</label>
-                                <input type="number" id="familySize" name="familySize" min="1">
-                                <small id="familySizeMsg" class="error-msg"></small>
-                            </div>
-
-                             <!-- Eligibility Message -->
-                             <div id="suitableHouseMessage" class="message"></div>
-
-                            <!-- Submit Button -->
-                            <button type="submit" class="submit-btn">Check Eligibility</button>
-                        </form>
-                    </section>
-                </div>
-            </div>
+           
             
             
         </main>

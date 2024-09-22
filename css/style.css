@@ -20,10 +20,12 @@ main {
 #sidebar {
     position: relative;
     width: 25rem;
-    height: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
     padding: 1rem;
     color: white;
-    background-color: #9b1c1f;
+    background-color: #CF2026;
     box-shadow: .8rem 0 .8rem rgba(0, 0, 0, .03), .4rem 0 .4rem rgba(0, 0, 0, .03), .2rem 0 .2rem rgba(0, 0, 0, .03);
     transition: max-width .5s ease-in-out;
     z-index: 200;
@@ -32,10 +34,30 @@ main {
     scrollbar-width: none;
     -ms-overflow-style: none; 
     text-align: center; 
+
 }
 
 #intro-sidebar {
-    display: block; /* Show intro-sidebar by default */
+    display: block;
+    padding: 1rem;
+}
+
+#footer{
+    text-align: center; /* Center the text in the middle horizontally */
+    position: relative;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2rem 2.5rem;
+}
+
+#footer p{
+    text-align: center; 
+}
+
+#footer p a{
+    color: white;
+    font-weight: 400;
 }
 
 /* Hide the sidebar by default */
@@ -45,7 +67,7 @@ main {
 
 
 #background{
-    margin-top: 8em;
+    margin-top: 4em;
 }
 
 .question-button {
@@ -95,12 +117,13 @@ main {
     cursor: pointer;
     font-size: 1.2rem;
     font-weight: bold;
-    color: #9b1c1f;
+    color: #CF2026;
 }
 /* TEXTS */
 
 h1 {
     text-align: center;
+    font-size: 1.2em;
 }
 
 h2{
@@ -128,6 +151,8 @@ h5{
     text-align: center;
     margin-top: 3em;
     font-weight: 300;
+    margin: 3em;
+    margin: 2em 2.5em;
 }
 
 button {
@@ -147,6 +172,11 @@ button {
     padding-top: 2.4rem;
     text-align: center;
 }
+
+#moreText {
+    display: none; /* Hide the extra text initially */
+}
+
 
 #map {
     flex: 1; /* Allows the map to take up the remaining space*/
@@ -228,36 +258,34 @@ button {
     top: 5%;
     left: 60%;
     transform: translate(-50%, -50%);
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 2.6rem;
-    padding: .6rem;
+    background-color: white;
+    border-radius: 0.5rem;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    box-shadow: 0 .8rem .8rem rgba(0, 0, 0, .03), 0 .4rem .4rem rgba(0, 0, 0, .03), 0 .2rem .2rem rgba(0, 0, 0, .03);
+    outline: 0.2rem solid #CF2026; 
 }
 
 #viewToggle button {
-    background: #9b1c1f;
-    color: white;
+    background: white;
+    color: #CF2026;
     border: none;
-    padding: .8rem;
-    border-radius: 2.6rem;
+    padding: .5rem;
+    border-radius: .5rem;
     cursor: pointer;
-    margin-right: 5px;
 }
 
 #viewToggle button.active {
-    background: #cf2026;
+    background: #CF2026;
+    color: white
 }
 
 
-
-#formView {
+#form-sidebar {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #9b1c1f;
+    background-color: #CF2026;
     padding: 20px;
     border-radius: 20px;
     box-shadow: .8rem 0 .8rem rgba(0, 0, 0, .03), .4rem 0 .4rem rgba(0, 0, 0, .03), .2rem 0 .2rem rgba(0, 0, 0, .03);
@@ -367,18 +395,17 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .mapboxgl-popup-content {
-    background: #9b1c1f;
-    border-radius: 10px;
+    background: #CF2026;
+    border-radius: 1em;
     box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
-    padding: 15px;
+    padding: 1em;
     pointer-events: auto;
     position: relative;
     color: white;
-    font-family: "raleway";
 }
 
 .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip  {
-    border-top-color: #9b1c1f;
+    border-top-color: #CF2026;
 }
 
 .mapboxgl-popup-close-button {
@@ -395,10 +422,11 @@ input[type="number"]::-webkit-outer-spin-button {
     color: #ffcccc; /* Optional: lighter color on hover */
 }
 
+/*BUTTON*/
 
 .white-btn {
     background-color: white;
-    color: #9b1c1f;
+    color: #CF2026;
     border: none;
     padding: 10px 15px;
     border-radius: 0.8em;
@@ -408,12 +436,31 @@ input[type="number"]::-webkit-outer-spin-button {
     transition: background-color 0.3s, color 0.3s, border 0.3s; /* Smooth transitions */
 
 }
-
 .white-btn:hover {
-    background-color: #9b1c1f;
+    background-color: #CF2026;
     color: white;
     border: 2px; 
     border-color: white;
+}
+
+.red-btn {
+    background-color: #CF2026;
+    color: white;
+    border: none;
+    outline: 2px solid white; /* Add an outline with color and thickness */
+    padding: 10px 15px;
+    border-radius: 0.8em;
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border 0.3s; /* Smooth transitions */
+    margin-left: 0; /* Remove any default margin */
+    display: block; /* Make it a block element */
+    text-align: left; /* Align text inside the button to the left */
+}
+
+.red-btn:hover {
+    background-color: white;
+    color:#CF2026;
 }
 
 /*SLIDER*/
@@ -457,10 +504,11 @@ input[type="range"]::-webkit-slider-thumb {
     appearance: none;
     width: 20px; /* Width of the thumb */
     height: 20px; /* Height of the thumb */
-    background: #cf2026; /* Thumb color */
+    background: #CF2026; /* Thumb color */
     border-radius: 50%; /* Make the thumb round */
     cursor: pointer;
     margin-top: -6px; /* Adjust the position of the thumb */
+    outline: 2px solid white;
 }
 
 #districts-sidebar {

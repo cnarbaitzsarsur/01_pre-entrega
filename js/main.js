@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const mapSidebar = document.getElementById('map-sidebar');
     const formSidebar = document.getElementById('form-sidebar');
 
-
     const btnToMap = document.getElementById('BtnToMap');
     const btnToInfo = document.getElementById('BtnToInfo');
     const btnToCheckEligibility = document.getElementById('btnToCheckEligibility');

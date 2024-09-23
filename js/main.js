@@ -20,6 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const mapSidebar = document.getElementById('map-sidebar');
     const formSidebar = document.getElementById('form-sidebar');
 
+    // Set default visibility
+    introSidebar.style.display = 'block';
+    mapSidebar.style.display = 'none';
+    formSidebar.style.display = 'none';
+
     const btnToMap = document.getElementById('BtnToMap');
     const btnToInfo = document.getElementById('BtnToInfo');
     const btnToCheckEligibility = document.getElementById('btnToCheckEligibility');

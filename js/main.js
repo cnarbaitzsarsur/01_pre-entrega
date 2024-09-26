@@ -95,10 +95,10 @@ map.on('load', () => {
     });
     map.addSource('block-baujahr', { type: 'geojson', data: 'json/block-baujahr.geojson'
     });
-    // map.addSource('bus-stops', { type: 'geojson', data: 'json/bus-stops.geojson'
-    // });
-    // map.addSource('ubahn-stops', { type: 'geojson', data: 'json/ubahn-stops.geojson'
-    // });
+    map.addSource('bus-stops', { type: 'geojson', data: 'json/bus-stops.geojson'
+    });
+    map.addSource('ubahn-stops', { type: 'geojson', data: 'json/ubahn-stops.geojson'
+    });
 
 
     map.addLayer({
@@ -299,8 +299,8 @@ function initializeSliders() {
     document.getElementById('big-green-coverage').value = 0;
     document.getElementById('medium-green-coverage').value = 0;
     document.getElementById('small-green-coverage').value = 0;
-    // document.getElementById('bus-buffer').value = 0;
-    // document.getElementById('ubahn-buffer').value = 0;
+    document.getElementById('bus-buffer').value = 0;
+    document.getElementById('ubahn-buffer').value = 0;
 }
 
 // Call the initialization function when the page loads
@@ -308,11 +308,11 @@ document.addEventListener('DOMContentLoaded', initializeSliders);
 
 
  // Slider event listeners
- document.getElementById('big-green-coverage').addEventListener('input', updateBufferZones);
- document.getElementById('medium-green-coverage').addEventListener('input', updateBufferZones);
- document.getElementById('small-green-coverage').addEventListener('input', updateBufferZones);
-//  document.getElementById('bus-buffer').addEventListener('input', updatePublicTransportBuffers);
-// document.getElementById('ubahn-buffer').addEventListener('input', updatePublicTransportBuffers);
+ document.getElementById('big-green-coverage').addEventListener('input', updateBigGreenSpaceBufferZone);
+ document.getElementById('medium-green-coverage').addEventListener('input', updateMediumGreenSpaceBufferZone);
+ document.getElementById('small-green-coverage').addEventListener('input', updateSmallGreenSpaceBufferZone);
+ document.getElementById('bus-buffer').addEventListener('input', updateBusBufferZone);
+document.getElementById('ubahn-buffer').addEventListener('input', updateUbahnBufferZone);
 
  // Update buffer distance display
  document.getElementById('big-green-coverage').addEventListener('input', (event) => {
@@ -324,27 +324,18 @@ document.addEventListener('DOMContentLoaded', initializeSliders);
  document.getElementById('small-green-coverage').addEventListener('input', (event) => {
      document.getElementById('small-buffer-distance').textContent = `${event.target.value}m`;
  });
-//  document.getElementById('bus-buffer').addEventListener('input', (event) => {
-//     document.getElementById('bus-buffer-distance').textContent = `${event.target.value}m`;
-// });
-// document.getElementById('ubahn-buffer').addEventListener('input', (event) => {
-//     document.getElementById('ubahn-buffer-distance').textContent = `${event.target.value}m`;
-// });
+ document.getElementById('bus-buffer').addEventListener('input', (event) => {
+    document.getElementById('bus-buffer-distance').textContent = `${event.target.value}m`;
+});
+document.getElementById('ubahn-buffer').addEventListener('input', (event) => {
+    document.getElementById('ubahn-buffer-distance').textContent = `${event.target.value}m`;
+});
 
 
- function updateBufferZones() {
+function updateBigGreenSpaceBufferZone() {
     const bigBufferDistance = parseInt(document.getElementById('big-green-coverage').value, 10);
-    const mediumBufferDistance = parseInt(document.getElementById('medium-green-coverage').value, 10);
-    const smallBufferDistance = parseInt(document.getElementById('small-green-coverage').value, 10);
 
-    // Fetch and process each green space type
-    Promise.all([
-        fetch('json/big-gs.geojson').then(response => response.json()),
-        fetch('json/medium-gs.geojson').then(response => response.json()),
-        fetch('json/small-gs.geojson').then(response => response.json())
-    ]).then(([bigData, mediumData, smallData]) => {
-
-        // Buffer big green spaces and handle MultiPolygon
+    fetch('json/big-gs.geojson').then(response => response.json()).then(bigData => {
         let bigBufferFeatures = bigData.features.map(feature =>
             turf.buffer(feature, bigBufferDistance, { units: 'meters' })
         );
@@ -354,33 +345,8 @@ document.addEventListener('DOMContentLoaded', initializeSliders);
         };
         const bigDissolved = turf.dissolve(bigFeatureCollection);
 
-        // Buffer medium green spaces and handle MultiPolygon
-        let mediumBufferFeatures = mediumData.features.map(feature =>
-            turf.buffer(feature, Math.min(mediumBufferDistance, 400), { units: 'meters' })
-        );
-        const mediumFeatureCollection = {
-            type: 'FeatureCollection',
-            features: mediumBufferFeatures
-        };
-        const mediumDissolved = turf.dissolve(mediumFeatureCollection);
-
-        // Buffer small green spaces and handle MultiPolygon
-        let smallBufferFeatures = smallData.features.map(feature =>
-            turf.buffer(feature, Math.min(smallBufferDistance, 200), { units: 'meters' })
-        );
-        const smallFeatureCollection = {
-            type: 'FeatureCollection',
-            features: smallBufferFeatures
-        };
-        const smallDissolved = turf.dissolve(smallFeatureCollection);
-
-        // Update buffer zones
-
         if (bigBufferDistance > 0) {
-            if (map.getSource('buffer-zone-big')) {
-                map.getSource('buffer-zone-big').setData(bigDissolved);
-                map.setLayoutProperty('buffer-zone-big', 'visibility', 'visible');
-            } else {
+            if (!map.getSource('buffer-zone-big')) {
                 map.addSource('buffer-zone-big', {
                     type: 'geojson',
                     data: bigDissolved
@@ -392,20 +358,40 @@ document.addEventListener('DOMContentLoaded', initializeSliders);
                     'source': 'buffer-zone-big',
                     'paint': {
                         'fill-color': '#CF2026',
-                        'fill-opacity': 0.5
+                        'fill-opacity': 0.3
                     }
                 });
+            } else {
+                map.getSource('buffer-zone-big').setData(bigDissolved);
+                map.setLayoutProperty('buffer-zone-big', 'visibility', 'visible');
             }
         } else {
             map.setLayoutProperty('buffer-zone-big', 'visibility', 'none');
+            if (map.getLayer('buffer-zone-big')) {
+                map.removeLayer('buffer-zone-big');
+            }
+            if (map.getSource('buffer-zone-big')) {
+                map.removeSource('buffer-zone-big');
+            }
         }
+    }).catch(err => console.error('Error loading big green spaces data:', err));
+}
 
-        // Update medium buffer zone
+function updateMediumGreenSpaceBufferZone() {
+    const mediumBufferDistance = parseInt(document.getElementById('medium-green-coverage').value, 10);
+
+    fetch('json/medium-gs.geojson').then(response => response.json()).then(mediumData => {
+        let mediumBufferFeatures = mediumData.features.map(feature =>
+            turf.buffer(feature, Math.min(mediumBufferDistance, 400), { units: 'meters' })
+        );
+        const mediumFeatureCollection = {
+            type: 'FeatureCollection',
+            features: mediumBufferFeatures
+        };
+        const mediumDissolved = turf.dissolve(mediumFeatureCollection);
+
         if (mediumBufferDistance > 0) {
-            if (map.getSource('buffer-zone-medium')) {
-                map.getSource('buffer-zone-medium').setData(mediumDissolved);
-                map.setLayoutProperty('buffer-zone-medium', 'visibility', 'visible');
-            } else {
+            if (!map.getSource('buffer-zone-medium')) {
                 map.addSource('buffer-zone-medium', {
                     type: 'geojson',
                     data: mediumDissolved
@@ -417,20 +403,40 @@ document.addEventListener('DOMContentLoaded', initializeSliders);
                     'source': 'buffer-zone-medium',
                     'paint': {
                         'fill-color': '#CF2026',
-                        'fill-opacity': 0.5
+                        'fill-opacity': 0.3
                     }
                 });
+            } else {
+                map.getSource('buffer-zone-medium').setData(mediumDissolved);
+                map.setLayoutProperty('buffer-zone-medium', 'visibility', 'visible');
             }
         } else {
             map.setLayoutProperty('buffer-zone-medium', 'visibility', 'none');
+            if (map.getLayer('buffer-zone-medium')) {
+                map.removeLayer('buffer-zone-medium');
+            }
+            if (map.getSource('buffer-zone-medium')) {
+                map.removeSource('buffer-zone-medium');
+            }
         }
+    }).catch(err => console.error('Error loading medium green spaces data:', err));
+}
 
-        // Update small buffer zone
+function updateSmallGreenSpaceBufferZone() {
+    const smallBufferDistance = parseInt(document.getElementById('small-green-coverage').value, 10);
+
+    fetch('json/small-gs.geojson').then(response => response.json()).then(smallData => {
+        let smallBufferFeatures = smallData.features.map(feature =>
+            turf.buffer(feature, Math.min(smallBufferDistance, 200), { units: 'meters' })
+        );
+        const smallFeatureCollection = {
+            type: 'FeatureCollection',
+            features: smallBufferFeatures
+        };
+        const smallDissolved = turf.dissolve(smallFeatureCollection);
+
         if (smallBufferDistance > 0) {
-            if (map.getSource('buffer-zone-small')) {
-                map.getSource('buffer-zone-small').setData(smallDissolved);
-                map.setLayoutProperty('buffer-zone-small', 'visibility', 'visible');
-            } else {
+            if (!map.getSource('buffer-zone-small')) {
                 map.addSource('buffer-zone-small', {
                     type: 'geojson',
                     data: smallDissolved
@@ -442,99 +448,159 @@ document.addEventListener('DOMContentLoaded', initializeSliders);
                     'source': 'buffer-zone-small',
                     'paint': {
                         'fill-color': '#CF2026',
-                        'fill-opacity': 0.5
+                        'fill-opacity': 0.3
                     }
                 });
+            } else {
+                map.getSource('buffer-zone-small').setData(smallDissolved);
+                map.setLayoutProperty('buffer-zone-small', 'visibility', 'visible');
             }
         } else {
             map.setLayoutProperty('buffer-zone-small', 'visibility', 'none');
+            if (map.getLayer('buffer-zone-small')) {
+                map.removeLayer('buffer-zone-small');
+            }
+            if (map.getSource('buffer-zone-small')) {
+                map.removeSource('buffer-zone-small');
+            }
         }
-        
-    }).catch(err => console.error('Error loading green spaces data:', err));
+    }).catch(err => console.error('Error loading small green spaces data:', err));
 }
 
-// function updatePublicTransportBuffers() {
-//     const busBufferDistance = parseInt(document.getElementById('bus-buffer').value, 10);
-//     const ubahnBufferDistance = parseInt(document.getElementById('ubahn-buffer').value, 10);
+function updateBusBufferZone() {
+    const busBufferDistance = parseInt(document.getElementById('bus-buffer').value, 10);
 
-//     // Fetch and process bus and U-Bahn data
-//     Promise.all([
-//         fetch('json/bus-stops.geojson').then(response => response.json()),
-//         fetch('json/ubahn-stops.geojson').then(response => response.json())
-//     ]).then(([busData, ubahnData]) => {
+    fetch('json/bus-stops.geojson').then(response => response.json()).then(busData => {
+        if (busBufferDistance === 0) {
+            // If the buffer distance is 0, set the layer's visibility to 'none' and remove the layer and source if they exist
+            map.setLayoutProperty('buffer-zone-bus', 'visibility', 'none');
+            if (map.getLayer('buffer-zone-bus')) {
+                map.removeLayer('buffer-zone-bus');
+            }
+            if (map.getSource('buffer-zone-bus')) {
+                map.removeSource('buffer-zone-bus');
+            }
+            return;
+        }
 
-//         // Buffer bus stops
-//         let busBufferFeatures = busData.features.map(feature =>
-//             turf.buffer(feature, busBufferFeatures, { units: 'meters' })
-//         );
-//         const busFeatureCollection = {
-//             type: 'FeatureCollection',
-//             features: busBufferFeatures
-//         };
-//         const busDissolved = turf.dissolve(busFeatureCollection);
+        let busBufferFeatures = busData.features
+            .filter(feature => feature && feature.geometry && feature.geometry.type)
+            .map(feature => turf.buffer(feature, busBufferDistance, { units: 'meters' }));
+        const busFeatureCollection = {
+            type: 'FeatureCollection',
+            features: busBufferFeatures
+        };
 
-//         // Buffer U-Bahn stops
-//         let ubahnBufferFeatures = ubahnData.features.map(feature =>
-//             turf.buffer(feature, Math.min(ubahnBufferFeatures, 800), { units: 'meters' })
-//         );
-//         const ubahnFeatureCollection = {
-//             type: 'FeatureCollection',
-//             features: ubahnBufferFeatures
-//         };
-//         const ubahnDissolved = turf.dissolve(ubahnFeatureCollection);
+        // Check if there are any features to dissolve
+        if (busBufferFeatures.length > 0) {
+            const busDissolved = turf.dissolve(busFeatureCollection);
 
-//         // Update buffer zones for bus stops
-//         if (busBufferDistance > 0) {
-//             if (map.getSource('buffer-zone-bus')) {
-//                 map.getSource('buffer-zone-bus').setData(busDissolved);
-//                 map.setLayoutProperty('buffer-zone-bus', 'visibility', 'visible');
-//             } else {
-//                 map.addSource('buffer-zone-bus', {
-//                     type: 'geojson',
-//                     data: busDissolved
-//                 });
+            if (!map.getSource('buffer-zone-bus')) {
+                map.addSource('buffer-zone-bus', {
+                    type: 'geojson',
+                    data: busDissolved
+                });
 
-//                 map.addLayer({
-//                     'id': 'buffer-zone-bus',
-//                     'type': 'fill',
-//                     'source': 'buffer-zone-bus',
-//                     'paint': {
-//                         'fill-color': 'black',
-//                         'fill-opacity': 0.5
-//                     }
-//                 });
-//             }
-//         } else {
-//             map.setLayoutProperty('buffer-zone-bus', 'visibility', 'none');
-//         }
+                map.loadImage(
+                    'img/bus-horlines.png',
+                    (err, image) => {
+                        if (err) throw err;
+                        map.addImage('bus-hatch-pattern', image);
+                        map.addLayer({
+                            'id': 'buffer-zone-bus',
+                            'type': 'fill',
+                            'source': 'buffer-zone-bus',
+                            'paint': {
+                                'fill-pattern': 'bus-hatch-pattern',
+                            }
+                        });
+                    }
+                );
+            } else {
+                map.getSource('buffer-zone-bus').setData(busDissolved);
+                map.setLayoutProperty('buffer-zone-bus', 'visibility', 'visible');
+            }
+        } else {
+            console.warn('No valid bus features to dissolve');
+            map.setLayoutProperty('buffer-zone-bus', 'visibility', 'none');
+            if (map.getLayer('buffer-zone-bus')) {
+                map.removeLayer('buffer-zone-bus');
+            }
+            if (map.getSource('buffer-zone-bus')) {
+                map.removeSource('buffer-zone-bus');
+            }
+        }
+    }).catch(err => console.error('Error loading bus data:', err));
+}
 
-//         // Update buffer zones for U-Bahn stops
-//         if (ubahnBufferDistance > 0) {
-//             if (map.getSource('buffer-zone-ubahn')) {
-//                 map.getSource('buffer-zone-ubahn').setData(ubahnDissolved);
-//                 map.setLayoutProperty('buffer-zone-ubahn', 'visibility', 'visible');
-//             } else {
-//                 map.addSource('buffer-zone-ubahn', {
-//                     type: 'geojson',
-//                     data: ubahnDissolved
-//                 });
+function updateUbahnBufferZone() {
+    const ubahnBufferDistance = parseInt(document.getElementById('ubahn-buffer').value, 10);
 
-//                 map.addLayer({
-//                     'id': 'buffer-zone-ubahn',
-//                     'type': 'fill',
-//                     'source': 'buffer-zone-ubahn',
-//                     'paint': {
-//                        'fill-color': 'black',
-//                         'fill-opacity': 0.5
-//                     }
-//                 });
-//             }
-//         } else {
-//             map.setLayoutProperty('buffer-zone-ubahn', 'visibility', 'none');
-//         }
+    fetch('json/ubahn-stops.geojson').then(response => response.json()).then(ubahnData => {
+        if (ubahnBufferDistance === 0) {
+            // If the buffer distance is 0, set the layer's visibility to 'none' and remove the layer and source if they exist
+            map.setLayoutProperty('buffer-zone-ubahn', 'visibility', 'none');
+            if (map.getLayer('buffer-zone-ubahn')) {
+                map.removeLayer('buffer-zone-ubahn');
+            }
+            if (map.getSource('buffer-zone-ubahn')) {
+                map.removeSource('buffer-zone-ubahn');
+            }
+            return;
+        }
 
-//     }).catch(err => console.error('Error loading public transport data:', err));
-// }
+        let ubahnBufferFeatures = ubahnData.features
+            .filter(feature => feature && feature.geometry && feature.geometry.type)
+            .map(feature => turf.buffer(feature, Math.min(ubahnBufferDistance, 800), { units: 'meters' }));
+        const ubahnFeatureCollection = {
+            type: 'FeatureCollection',
+            features: ubahnBufferFeatures
+        };
+
+        // Check if there are any features to dissolve
+        if (ubahnBufferFeatures.length > 0) {
+            const ubahnDissolved = turf.dissolve(ubahnFeatureCollection);
+
+            if (!map.getSource('buffer-zone-ubahn')) {
+                map.addSource('buffer-zone-ubahn', {
+                    type: 'geojson',
+                    data: ubahnDissolved
+                });
+
+                map.loadImage(
+                    'img/ubahn-vertlines.png',
+                    (err, image) => {
+                        if (err) throw err;
+                        map.addImage('ubahn-hatch-pattern', image);
+                        map.addLayer({
+                            'id': 'buffer-zone-ubahn',
+                            'type': 'fill',
+                            'source': 'buffer-zone-ubahn',
+                            'paint': {
+                                'fill-pattern': 'ubahn-hatch-pattern',
+                                'fill-pattern-scale': `{auto|fixed}` // Defaults to 'auto'?
+
+                            }
+                        });
+                    }
+                );
+            } else {
+                map.getSource('buffer-zone-ubahn').setData(ubahnDissolved);
+                map.setLayoutProperty('buffer-zone-ubahn', 'visibility', 'visible');
+            }
+        } else {
+            console.warn('No valid U-Bahn features to dissolve');
+            map.setLayoutProperty('buffer-zone-ubahn', 'visibility', 'none');
+            if (map.getLayer('buffer-zone-ubahn')) {
+                map.removeLayer('buffer-zone-ubahn');
+            }
+            if (map.getSource('buffer-zone-ubahn')) {
+                map.removeSource('buffer-zone-ubahn');
+            }
+        }
+    }).catch(err => console.error('Error loading U-Bahn data:', err));
+}
+
 
 
 // --- FORM --- //

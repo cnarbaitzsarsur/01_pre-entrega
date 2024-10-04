@@ -26,10 +26,12 @@
 
             <!-- Sidebar -->
             <div id="sidebar">
+
                 <div id="intro-sidebar">
                     <section id="intro">
                         <h1>X-RAY OF VIENNA SOCIAL HOUSING</h1>
-                        <h5> Vienna's social housing system is a world-renowned example. This interactive map explores its location, accessibility, and distribution across districts.  </h5>
+                        <h5> Vienna's social housing system is a world-renowned example. This interactive map explores its location, accessibility, and distribution across districts. </h5>
+
                     </section>
                     
                     <section id="background">
@@ -50,98 +52,119 @@
                         <p><a href="http://www.cnscartography.com" target="_blank">www.cnscartography.com</a></p>
                     </section>
                 </div>
+
                 <div id="map-sidebar" style="display: none;">
-                    <section>
+                    <section id="intro">
                         <h1>X-RAY OF VIENNA SOCIAL HOUSING</h1>
-                        <h5>Here you can explore Vienna's green space and public transport coverage, while seeing the location of the social housing developments on the map.</h5>
                     </section>
                     
-                    <section class="properties">
-                        <div class="field">
-                            <h4>HOUSING CONSTRUCTION YEAR
-                                <button title="Explanation" class="question-button">
-                                    <img src="svg/question-circle.svg" alt="question mark" width="20" height="20">
-                                </button>
-                            </h4>
-                            <div class="slider">
-                                <input type="range" id="yearSlider" min="1900" max="2023" value="2023" step="1">
-                                <span id="selectedYear">2023</span>
-                            </div>
-                        </div>
-                        <div class="field">
-                            <h4>DISTANCE COVERED by Green Spaces
-                                <button title="Explanation" class="question-button">
-                                    <img src="svg/question-circle.svg" alt="question mark" width="20" height="20">
-                                </button>
-                            </h4>
-                            
-                            <div class="slider">
-                                <h4>Big Green spaces</h4>
-                                <span style="width: 1rem;"></span>
-                                <input id="big-green-coverage" type="range" min="0" max="800" step="100">
-                                <label for="big-green-coverage" style="left: -2rem;">
-                                    <mark id="big-buffer-distance">0m</mark>
-                                </label>
+                    <div id="historySection">
+                        <h2 id="historyTitle">HISTORICAL ANALYSIS</h2>
+
+                        <section class = "propertiesHistory">
+                            <div>
+                                <h4>SOCIAL HOUSING BUILDINGS</h4>
+                                <p>Click on the highlighted red social housing buildings to reveal detailed information about each one.</p>
                             </div>
 
-                            <div class="slider">
-                                <h4>Medium Green Spaces</h4>
-                                <input id="medium-green-coverage" type="range" min="0" max="400" step="100" value="0">
-                                <label for="medium-green-coverage">
-                                    <mark id="medium-buffer-distance">0m</mark>
-                                </label>
+                            <h4>HOUSING CONSTRUCTION YEAR</h4>
+                            <p>Move the slider and see the development of social housing in Vienna</p>
+                            <div class="year-slider">
+                                <input type="range" id="yearSlider" min="1900" max="2004" value="2004" step="1">
+                                <span id="selectedYear">2004</span>
                             </div>
                             
-                            <div class="slider">
-                                <h4>Small Green Spaces</h4>
-                                <input id="small-green-coverage" type="range" min="0" max="200" step="50" value="0">
-                                <label for="small-green-coverage">
-                                    <mark id="small-buffer-distance">0m</mark>
-                                </label>
-                            </div>
+                            <h3 id="unitsConstructedText">
+                                In  <span class="highlighted-text" id="constructedYear">2023</span><br>
+                                <span class="highlighted-text" id="constructedUnits">X</span>
+                                new social housing units <br> 
+                                were constructed
+                            </h3>
 
-                        </div>
-                        <div class="field">
-                            <h4>DISTANCE COVERED by Public Transport
-                                <button title="Explanation" class="question-button">
-                                    <img src="svg/question-circle.svg" alt="question mark" width="20" height="20">
-                                </button>
-                            </h4>
-                            
-                            <div class="slider">
-                                <h4>Bus Stops</h4>
-                                <span style="width: 1rem;"></span>
-                                <input id="bus-buffer" type="range" min="0" max="400" step="100" value="0">
-                                <label for="bus-buffer">
-                                    <mark id="bus-buffer-distance">0m</mark>
-                                </label>
-                            </div>
+                            <p>*in 2004, the entire subsidised housing segment was transferred from the City of Vienna to non-profit and limited-profit housing developers. 
+                            </p>
+                        </section>
+                    </div>
+
+                    <div id="proximitySection">
                         
-                            <div class="slider">
-                                <h4>U-Bahn Stops</h4>
-                                <input id="ubahn-buffer" type="range" min="0" max="800" step="100" value="0">
-                                <label for="ubahn-buffer">
-                                    <mark id="ubahn-buffer-distance">0m</mark>
-                                </label>
+                        <h2 id="proximityTitle">PROXIMITY ANALYSIS</h2>
+                        
+                        <section class="properties">
+                            
+                            <div class="field">
+                                <h4>AREA COVERED BY GREEN SPACES
+                                    <button title="Explanation" class="question-button">
+                                        <img src="svg/question-circle.svg" alt="question mark" width="20" height="20">
+                                    </button>
+                                </h4>
+                                
+                                <div class="slider">
+                                    <p>Big Green spaces</p>
+                                    <span style="width: 1rem;"></span>
+                                    <input id="big-green-coverage" type="range" min="0" max="800" step="100">
+                                    <label for="big-green-coverage" style="left: -2rem;">
+                                        <mark id="big-buffer-distance">0m</mark>
+                                    </label>
+                                </div>
+
+                                <div class="slider">
+                                    <p>Medium Green Spaces</p>
+                                    <input id="medium-green-coverage" type="range" min="0" max="400" step="100" value="0">
+                                    <label for="medium-green-coverage">
+                                        <mark id="medium-buffer-distance">0m</mark>
+                                    </label>
+                                </div>
+                                
+                                <div class="slider">
+                                    <p>Small Green Spaces</p>
+                                    <input id="small-green-coverage" type="range" min="0" max="200" step="50" value="0">
+                                    <label for="small-green-coverage">
+                                        <mark id="small-buffer-distance">0m</mark>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-                    </section>
+
+                            <div class="field">
+                                <h4>AREA COVERED BY PUBLIC TRANSPORT
+                                    <button title="Explanation" class="question-button">
+                                        <img src="svg/question-circle.svg" alt="question mark" width="20" height="20">
+                                    </button>
+                                </h4>
+                                
+                                <div class="slider">
+                                    <p>Bus Stops</p>
+                                    <span style="width: 1rem;"></span>
+                                    <input id="bus-buffer" type="range" min="0" max="400" step="100" value="0">
+                                    <label for="bus-buffer">
+                                        <mark id="bus-buffer-distance">0m</mark>
+                                    </label>
+                                </div>
+                            
+                                <div class="slider">
+                                    <p>U-Bahn Stops</p>
+                                    <input id="ubahn-buffer" type="range" min="0" max="800" step="100" value="0">
+                                    <label for="ubahn-buffer">
+                                        <mark id="ubahn-buffer-distance">0m</mark>
+                                    </label>
+                                </div>
+                            </div>
+                        </section>
+                    </div>    
                     
                     <section class ="elegibility">
                         <button class="white-btn" id="btnToCheckEligibility">Check Eligibility</button>
 
                     </section>
-
-                    <button class="white-btn" id="BtnToInfo"> Back to Info</button>
-                    
                     
                 </div>
-                <div id="form-sidebar" style="display:none;">
+
+                <div id="form-sidebar" style="display: none;">
                     <button id="closeFormBtn" style="position: absolute; top: 10px; right: 10px;">&times;</button>
                     <div class="form-container">
                         <section class="eligibility-form">
                             <form id="eligibilityForm">
-                                
+
                                 <!-- Citizenship Input -->
                                 <div class="form-group">
                                     <label for="citizenship">Do you have Austrian Citizenship or equivalent?</label>
@@ -194,19 +217,17 @@
                         </section>
                     </div>
                 </div>
+                
             </div>
 
-            <!-- Popup Window -->
-            <div id="popup" class="popup-window">
-                <span class="popup-close" onclick="togglePopup()">&times;</span>
-                <p>This is an explanation about green spaces coverage.</p>
-            </div>
 
             <!-- View Toggle -->
             <div id="viewToggle">
+                <button id="infoBtn">INFO</button>
                 <button id="mapViewBtn">MAP</button>
                 <button id="districtsViewBtn">DISTRICTS</button>
             </div>
+
             
             <!-- Map View -->
             <div id="map" class="map">
@@ -253,9 +274,6 @@
                     </section>
                 </section>
             </div>
-               
-                    
-           
             
             
         </main>

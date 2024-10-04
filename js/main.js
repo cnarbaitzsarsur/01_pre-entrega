@@ -1,4 +1,4 @@
-// Mapbox access token and initialization
+// ----- MAPBOX ----- //
 mapboxgl.accessToken = 'pk.eyJ1IjoibGFicGFycXVlcGF0cmljaW9zIiwiYSI6ImNqOWE4OGY3MjEweHEzM3FtZHl0dmV5azEifQ.uIJaP80p-gQXAvPG8tF-3w';
 const map = new mapboxgl.Map({
     container: 'map', // container ID
@@ -13,70 +13,161 @@ const map = new mapboxgl.Map({
 document.getElementById('loading-spinner').style.display = 'flex';
 
 
-// ----- SIDEBAR ----- //
+// ----- SIDEBAR + VIEW TOGGLE----- //
 
 document.addEventListener('DOMContentLoaded', () => {
+    //SIDEBAR  + BUTTONS 
     const introSidebar = document.getElementById('intro-sidebar');
     const mapSidebar = document.getElementById('map-sidebar');
     const formSidebar = document.getElementById('form-sidebar');
-
-    // Set default visibility
-    introSidebar.style.display = 'block';
-    mapSidebar.style.display = 'none';
-    formSidebar.style.display = 'none';
+    const viewToggle = document.getElementById('viewToggle');
+    const districtsView = document.getElementById('districtsView')
+    const map = document.getElementById('map')
 
     const btnToMap = document.getElementById('BtnToMap');
-    const btnToInfo = document.getElementById('BtnToInfo');
+    const btnToInfo = document.getElementById('infoBtn');
+    const mapViewBtn = document.getElementById('mapViewBtn');
+    const districtsViewBtn = document.getElementById('districtsViewBtn');
+
     const btnToCheckEligibility = document.getElementById('btnToCheckEligibility');
     const closeFormBtn = document.getElementById('closeFormBtn');
+    
+    
+    // Set default visibility
+    introSidebar.style.display = 'block';
+    map.style.display = 'block'
+    mapSidebar.style.display = 'none';
+    formSidebar.style.display = 'none';
+    viewToggle.classList.add('hidden');
+    districtsView.style.display = 'none';
+
+    // --- BUTTONS INTRO-SIDEBAR --- //
 
     btnToMap.addEventListener('click', () => {
         introSidebar.style.display = 'none';
         mapSidebar.style.display = 'block';
+        viewToggle.classList.remove('hidden');
+        mapViewBtn.classList.add('active');
     });
+
+    const moreText = document.getElementById('moreText');
+    const btnText = document.getElementById('readMoreBtn');
+
+    readMoreBtn.addEventListener('click', () => {
+        if (moreText.style.display === "none" || moreText.style.display === "") {
+            moreText.style.display = "inline";
+            btnText.innerHTML = "Read Less"; // Change button text
+        } else {
+            moreText.style.display = "none";
+            btnText.innerHTML = "Keep Reading"; // Change button text back
+        }
+    });
+
+    
+    // --- BUTTONS VIEW TOGGLE --- //
 
     btnToInfo.addEventListener('click',() => {
         mapSidebar.style.display = 'none';
         introSidebar.style.display = 'block';
+        viewToggle.classList.add('hidden');
+        map.style.display = 'block';
+        districtsView.style.display = 'none';
+        districtsViewBtn.classList.remove('active');
+    });
+
+    mapViewBtn.addEventListener('click', function() {
+        map.style.display = 'block';
+        districtsView.style.display = 'none';
+        districtsViewBtn.classList.remove('active');
+        btnToInfo.classList.remove('active');
+        mapViewBtn.classList.add('active');
+    });
+
+    districtsViewBtn.addEventListener('click', function() {
+        map.style.display = 'none';
+        districtsView.style.display = 'block';
+        mapViewBtn.classList.remove('active');
+        btnToInfo.classList.remove('active');
+        districtsViewBtn.classList.add('active');
     });
 
     btnToCheckEligibility.addEventListener('click', () => {
         introSidebar.style.display = 'none';
         mapSidebar.style.display = 'block';
-        formSidebar.style.display = 'block'; // Adjust if needed
+        formSidebar.style.display = 'block';
     });
-
-    document.getElementById('districtsViewBtn').classList.add('active');
 
     closeFormBtn.addEventListener('click', () => {
         // Hide eligibility form or perform other actions
         document.getElementById('form-sidebar').style.display = 'none';
     });
+   
 });
 
-document.getElementById('readMoreBtn').addEventListener('click', function() {
-    const moreText = document.getElementById('moreText');
-    const btnText = document.getElementById('readMoreBtn');
+// ----- PROXIMITY SECTION ----- //
 
-    if (moreText.style.display === "none") {
-        moreText.style.display = "inline";
-        btnText.innerHTML = "Read Less"; // Change button text
-    } else {
-        moreText.style.display = "none";
-        btnText.innerHTML = "Keep Reading"; // Change button text back
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    const proximityTitle = document.getElementById('proximityTitle');
+    const historyTitle = document.getElementById('historyTitle');
+    const propertiesSection = document.querySelector('.properties');
+    const historySection = document.querySelector('.propertiesHistory'); // Historical analysis content
+
+    // Initial collapse setup
+    propertiesSection.style.display = 'none';
+    historySection.style.display = 'block';
+
+    // Toggle proximity analysis
+    proximityTitle.addEventListener('click', function() {
+        if (propertiesSection.style.display === 'none' || propertiesSection.style.display === '') {
+            propertiesSection.style.display = 'block';
+            historySection.style.display = 'none'; 
+        } else {
+            propertiesSection.style.display = 'none'; 
+            historySection.style.display = 'block';
+        }
+    });
+
+    // Toggle historical analysis
+    historyTitle.addEventListener('click', function() {
+        if (historySection.style.display === 'none' || historySection.style.display === '') {
+            historySection.style.display = 'block';
+            propertiesSection.style.display = 'none'; 
+        } else {
+            historySection.style.display = 'none'; 
+            propertiesSection.style.display = 'block';
+        }
+    });
+
 });
 
 
-// ----- INFO BUTTONS ----- //
+
+
+
+// ----- QUESTION BUTTONS ----- //
 
 document.querySelector('.question-button').addEventListener('click', function() {
     Swal.fire({
-        title: 'Green Spaces Coverage',
-        text: 'It refers to the amount of land in an area that is covered by vegetation such as trees, grass, and other greenery.',
-        confirmButtonText: 'Got it!',
-        background: '#f0f0f0',
-        confirmButtonColor: '#CF2026'
+        title: 'The buffer zones around the green spaces are related to their sizes',
+        html: `
+            <button id="customCloseButton" style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 20px; cursor: pointer; color: white;">&times;</button>
+            <ul>
+                <li><strong> Big green spaces</strong> are large spaces whose areas range from 10 hectares, and are designed to serve populations within <strong> 800 meters</strong>.</li>
+                <br>
+                <li><strong>Medium green spaces</strong> are spaces whose areas range from 0.4 to 10 hectares, and are designed to serve populations within<strong> 400 meters</strong>.</li>
+                <br>
+                <li><strong>Small green spaces</strong> are spaces whose average areas range around 0.04 hectares, and are designed to serve populations within <strong>200 meters</strong>.</li>
+            </ul>
+        `,
+        showConfirmButton: false,
+        background: '#CF2026',
+        customClass: {
+            title: 'swal2-title-custom',
+            htmlContainer: 'swal2-text-custom'
+        }
+    });
+    document.getElementById('customCloseButton').addEventListener('click', function() {
+        Swal.close();
     });
 });
 
@@ -91,7 +182,7 @@ map.on('load', () => {
     });
     map.addSource('small-gs', { type: 'geojson', data: 'json/small-gs.geojson'
     });
-    map.addSource('social-housing', { type: 'geojson', data: 'json/social-housing.json'
+    map.addSource('social-housing', { type: 'geojson', data: 'json/social-housing.geojson'
     });
     map.addSource('block-baujahr', { type: 'geojson', data: 'json/block-baujahr.geojson'
     });
@@ -120,36 +211,8 @@ map.on('load', () => {
         },
         filter: ['==', '$type', 'Polygon'] 
     });
-    
-    map.addLayer({
-        'id': 'block-baujahr',
-        'type': 'fill',
-        'source': 'block-baujahr',
-        'paint': {
-            'fill-color': '#CF2026',
-            'fill-opacity': 0.6
-        }
-    }); 
 
-    // map.addLayer({
-    //     'id': 'bus-stops',
-    //     'type': 'circle', // Change to 'circle' for better visibility
-    //     'source': 'bus-stops',
-    //     'paint': {
-    //         'circle-color': 'blue', // Color for bus stops
-    //         'circle-radius': 2       // Adjust radius for visibility
-    //     }
-    // });
-
-    // map.addLayer({
-    //     'id': 'ubahn-stops',
-    //     'type': 'circle', // Using circle for uniformity
-    //     'source': 'ubahn-stops',
-    //     'paint': {
-    //         'circle-color': 'green', // Color for U-Bahn stops
-    //         'circle-radius': 2        // Adjust radius for visibility
-    //     }
-    // });
+    map.moveLayer('social-housing');
     
     // Popup setup Social Housing
     let popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false
@@ -220,44 +283,16 @@ map.on('load', () => {
     map.on('mouseenter', 'social-housing-buffer', () => {
         map.getCanvas().style.cursor = 'pointer';
     });
-
-    map.on('mouseleave', 'social-housing-buffer', () => {
-        map.getCanvas().style.cursor = '';
-    });
 });
 
-// ----- TOGGLE VIEW ----- //
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Set the initial active/inactive states
-    document.getElementById('mapViewBtn').classList.add('active');
-    document.getElementById('districtsViewBtn').classList.remove('active');
-    
-    // Display the map view by default
-    document.getElementById('map').style.display = 'block';
-    document.getElementById('districtsView').style.display = 'none';
-
-    // Toggle view functionality
-    document.getElementById('mapViewBtn').addEventListener('click', function() {
-        document.getElementById('map').style.display = 'block';
-        document.getElementById('districtsView').style.display = 'none';
-        document.getElementById('districtsViewBtn').classList.remove('active');
-        document.getElementById('mapViewBtn').classList.add('active');
-    });
-
-    // Toggle to district view
-    document.getElementById('districtsViewBtn').addEventListener('click', function() {
-        document.getElementById('map').style.display = 'none';
-        document.getElementById('districtsView').style.display = 'block';
-        document.getElementById('mapViewBtn').classList.remove('active');
-        document.getElementById('districtsViewBtn').classList.add('active');
-    });
-});
 
 // ----- SLIDER YEARS ----- //
 
 const yearSlider = document.getElementById('yearSlider');
 const selectedYearDisplay = document.getElementById('selectedYear');
+const unitsConstructedText = document.getElementById('unitsConstructedText');
+const constructedYear = document.getElementById('constructedYear');
+const constructedUnits = document.getElementById('constructedUnits');
 
 yearSlider.addEventListener('input', () => {
     const selectedYear = parseInt(yearSlider.value, 10);
@@ -269,29 +304,41 @@ yearSlider.addEventListener('input', () => {
 
 function updateVisibleBuildings(selectedYear) {
     // Fetch social housing data
-    fetch('json/block-baujahr.geojson') 
+    fetch('json/social-housing.geojson') 
         .then(response => response.json())
         .then(data => {
-            // Filter buildings based on BAUJAHR
+
+            // Filter buildings built on or before the selected year for the map display
             const filteredBuildings = data.features.filter(feature => {
-                const baijahr = feature.properties.BAUJAHR1;
-                return baijahr <= selectedYear; // Include buildings built on or before the selected year
+                const baujahr = parseInt(feature.properties.BAUJAHR, 10); // Ensure BAUJAHR is a number
+                return baujahr <= selectedYear;
             });
 
             // Update map layer with filtered data
-            if (map.getSource('block-baujahr')) {
-                map.getSource('block-baujahr').setData({
+            if (map.getSource('social-housing')) {
+                map.getSource('social-housing').setData({
                     type: 'FeatureCollection',
                     features: filteredBuildings
                 });
             }
+
+            // Calculate total units for the selected year
+            const totalUnits = filteredBuildings.reduce((sum, feature) => {
+                const baujahr = parseInt(feature.properties.BAUJAHR, 10); // Ensure BAUJAHR is a number
+                const wohnungsanzahl = parseInt(feature.properties.WOHNUNGSANZAHL, 10) || 0; // Ensure WOHNUNGSANZAHL is a number
+                const unitsToAdd = baujahr === selectedYear ? wohnungsanzahl : 0;
+                return sum + unitsToAdd;
+            }, 0);
+
+            // Update the constructed units text with the total number of units
+            constructedYear.textContent = selectedYear;
+            constructedUnits.textContent = totalUnits;
         })
         .catch(err => console.error('Error loading social housing data:', err));
 }
 
 // Initialize with the default value
 updateVisibleBuildings(parseInt(yearSlider.value, 10));
-
 
 // ----- BUFFERS ----- //
 
@@ -600,6 +647,8 @@ function updateUbahnBufferZone() {
         }
     }).catch(err => console.error('Error loading U-Bahn data:', err));
 }
+
+
 
 
 

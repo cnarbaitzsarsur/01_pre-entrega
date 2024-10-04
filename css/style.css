@@ -23,7 +23,7 @@ main {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    padding: 1rem;
+    padding: 2rem;
     color: white;
     background-color: #CF2026;
     box-shadow: .8rem 0 .8rem rgba(0, 0, 0, .03), .4rem 0 .4rem rgba(0, 0, 0, .03), .2rem 0 .2rem rgba(0, 0, 0, .03);
@@ -40,6 +40,48 @@ main {
 #intro-sidebar {
     display: block;
     padding: 1rem;
+}
+
+#historySection{
+    margin: 3em 0em 2em 0em;
+}
+
+#historyTitle {
+    cursor: pointer;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.3s ease-in-out;
+}
+
+.properties {
+    display: none;
+}
+
+#proximitySection {
+    margin: 1rem 0;
+}
+
+#proximityTitle {
+    cursor: pointer;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.3s ease-in-out;
+}
+
+#proximityTitle:hover, #historyTitle:hover {
+opacity: 50%;
+}
+
+section.collapsible {
+    max-height: 0; /* Start collapsed */
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.5s ease;
+}
+
+section.expanded {
+    max-height: 1000px; /* Adjust depending on content size */
+    opacity: 1;
 }
 
 #footer{
@@ -70,6 +112,7 @@ main {
     margin-top: 4em;
 }
 
+
 .question-button {
     background: none;
     border: none;
@@ -89,36 +132,6 @@ main {
     filter: brightness(1.2); /* Optional: lighten the icon on hover */
 }
 
-.popup-window {
-    display: none; /* Initially hidden */
-    position: absolute;
-    top: 30px; /* Adjust as needed */
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 15px;
-    z-index: 1000;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    max-width: 200px; /* Adjust width */
-    color: #333;
-}
-
-.popup-window p {
-    margin: 0;
-    font-size: 0.875rem;
-}
-
-.popup-close {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #CF2026;
-}
 /* TEXTS */
 
 h1 {
@@ -129,7 +142,15 @@ h1 {
 h2{
     margin-block-end: 0.4em;
     text-align: left;
+    font-size: 1.1em;
+    font-weight: 600;
+
+}
+
+h3{
+    text-align: center;
     font-size: 0.9em;
+    font-weight: 500;
 }
 
 h4{
@@ -137,13 +158,19 @@ h4{
     text-align: left;
     font-size: 0.9em;
     font-weight: 500;
+    margin-top: 3em;
 }
+
 
 p {
     font-size: 0.7em;
     font-family: "Poppins", sans-serif;
     font-weight: 300;
     text-align: left;
+}
+
+.properties .field p{
+    font-size: 0.8em;
 }
 
 h5{
@@ -154,6 +181,41 @@ h5{
     margin: 3em;
     margin: 2em 2.5em;
 }
+
+#unitsConstructedText{
+    margin-bottom: 2em;
+}
+
+.highlighted-text {
+    background-color: white;
+    color: #CF2026;
+    padding: 0.3em; 
+    border-radius: 0.3em; 
+    display: inline-block;
+    font-size: 1.5em; 
+    font-weight: bold; 
+    width: 3em;
+    height: 1.3em;
+}
+
+.swal2-title-custom{
+    padding-top: 2em;
+    color: white;
+    font-size: 18px;
+}
+.swal2-text-custom ul {
+    font-size: 0.8em; 
+    font-weight: 200;
+    line-height: 1.5; 
+    padding-left: 1em;
+    text-align: left;
+    color: white;
+}
+
+.swal2-html-container{
+    padding: 1em;
+}
+
 
 button {
     font-family: "Poppins", sans-serif;
@@ -199,6 +261,7 @@ button {
     padding: 1rem;
     margin-top: 7%;
     overflow: auto; /* Enable scrolling if needed */
+    
 }
 
 .radarExplanation {
@@ -263,6 +326,8 @@ button {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     outline: 0.2rem solid #CF2026; 
+    transition: opacity 0.5s ease-in-out;
+    overflow: hidden;
 }
 
 #viewToggle button {
@@ -274,10 +339,21 @@ button {
     cursor: pointer;
 }
 
+#viewToggle button:hover {
+    opacity: 50%;
+}
+
 #viewToggle button.active {
     background: #CF2026;
     color: white
 }
+
+#viewToggle.hidden {
+    opacity: 0;
+}
+
+
+
 
 
 #form-sidebar {
@@ -465,17 +541,27 @@ input[type="number"]::-webkit-outer-spin-button {
 
 /*SLIDER*/
 
+.year-slider {
+    display: flex;
+    align-items: center; /* Aligns the items vertically in the center */
+    gap: 1rem; /* Space between elements */
+    width: 23rem;
+    height: 2rem;
+    font-size: 0.8em;
+    margin: 3em 0 3em 0;
+}
+
 .slider {
     display: flex;
     align-items: center; /* Aligns the items vertically in the center */
     gap: 1rem; /* Space between elements */
-    width: 25rem;
+    width: 23rem;
     height: 2rem;
     font-size: 0.8em;
+    margin: 2em 0 2em 0;
 }
 
-
-.slider label {
+.slider, .year-slider label{
     margin-left: 0.5rem; /* Adds space between the slider and the label */
     font-size: 1rem; /* Adjusts font size */
 }
